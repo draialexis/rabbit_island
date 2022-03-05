@@ -11,11 +11,9 @@ public class SimpleRabbitSim
     static long popByMonth(int months)
     {
         long m_1, m_2, current = 0;
-        int i;
         // step1: take a couple of baby rabbits
-        m_1 = 1;
         // step2: wait a month, the couple is now mature for reproduction
-        m_2 = 1;
+        m_1 = m_2 = 1;
         if (months <= 0) throw new IllegalArgumentException("fibo(x) | x<=0 = N/A");
         if (months == 1 || months == 2)
         {
@@ -23,9 +21,9 @@ public class SimpleRabbitSim
             // System.out.print(1 + ", ");
             return 1;
         }
-        for (i = 3; i <= months; i++)
+        for (int i = 3; i <= months; i++)
         {
-            // step3: do the math
+            // step3: apply the fibonacci formula
             current = m_1 + m_2;
             m_2 = m_1;
             m_1 = current;
