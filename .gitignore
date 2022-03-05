@@ -1,4 +1,5 @@
 # Project exclude paths
 /out/
+/build/
 .idea/
 sims_tp4.iml
