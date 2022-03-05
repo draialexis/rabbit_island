@@ -2,9 +2,11 @@ public class SimpleRabbitSim
 {
     /**
      * popByMonth
-     * determines the size of a rabbit population, in couples
-     * @param months
-     * @return
+     * determines the size of a rabbit population, <strong>in couples</strong>,
+     * with regard to how many months it has had to grow
+     *
+     * @param months the amount of time since the first couple was spawned
+     * @return the size of said rabbit population after said number of months, <strong>in couples</strong>
      */
     static long popByMonth(int months)
     {
