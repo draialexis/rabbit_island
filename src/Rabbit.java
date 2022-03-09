@@ -22,7 +22,7 @@ public class Rabbit
     static
     {
         yearlyMortality = new HashMap<>();
-        yearlyMortality.put('k', 0.98);  // kid 0.5
+        yearlyMortality.put('k', 0.5);  // kid 0.5
         yearlyMortality.put('m', 0.25); // mature
         yearlyMortality.put('1', 0.4);  // mature + 1 ([8,  9 [ yo)
         yearlyMortality.put('2', 0.55); // mature + 2 ([9,  10[ yo)
@@ -33,7 +33,7 @@ public class Rabbit
 
     Rabbit()
     {
-        this(Sex.FEMALE); // rdm 50/50 _continuous
+        this(Math.random() < 0.5 ? Sex.FEMALE : Sex.MALE);
     }
 
     Rabbit(Sex s)
@@ -84,45 +84,6 @@ public class Rabbit
         this.monthlyMortality = monthlyMortality;
     }
 
-    void updateMonthlyMortality()
-    {
-        for (int i = 1; i <= MAX_AGE_MONTHS; i++)
-        {
-            char ch = 0;
-            if (!(this.isMature()))
-            {
-                ch = 'k';
-            } else if (i <= 84)
-            {
-                ch = 'm';
-            } else if (i <= 96)
-            {
-                ch = '1';
-            } else if (i <= 108)
-            {
-                ch = '2';
-            } else if (i <= 120)
-            {
-                ch = '3';
-            } else if (i <= 132)
-            {
-                ch = '4';
-            } else if (i <= 144)
-            {
-                ch = '5';
-            }
-            if (ch == 0)
-            {
-                throw new RuntimeException("could not establish rabbit monthly mortality rate");
-            } else
-            {
-                double m_m = Math.pow((1 + yearlyMortality.get(ch)), (1 / 12.0)) - 1;
-                System.out.println(this + " ; age = " + this.ageMonths + " ; m_m = " + m_m);
-                this.setMonthlyMortality(m_m);
-            }
-        }
-    }
-
     public boolean isDead()
     {
         return this.isDead;
@@ -158,6 +119,43 @@ public class Rabbit
         this.isDue = due;
     }
 
+    void updateMonthlyMortality()
+    {
+        for (int i = 1; i <= MAX_AGE_MONTHS; i++)
+        {
+            char ch = 0;
+            if (!(this.isMature()))
+            {
+                ch = 'k';
+            } else if (i <= 84)
+            {
+                ch = 'm';
+            } else if (i <= 96)
+            {
+                ch = '1';
+            } else if (i <= 108)
+            {
+                ch = '2';
+            } else if (i <= 120)
+            {
+                ch = '3';
+            } else if (i <= 132)
+            {
+                ch = '4';
+            } else if (i <= 144)
+            {
+                ch = '5';
+            }
+            if (ch == 0)
+            {
+                throw new RuntimeException("could not establish rabbit monthly mortality rate");
+            } else
+            {
+                this.setMonthlyMortality(Math.pow((1 + yearlyMortality.get(ch)), (1 / 12.0)) - 1);
+            }
+        }
+    }
+
     void ageUp()
     {
         this.ageMonths++;
@@ -170,7 +168,7 @@ public class Rabbit
         }
         this.updateMonthlyMortality();
         if (this.ageMonths == MAX_AGE_MONTHS || rdm < this.monthlyMortality)
-        { //see notes, rdm hardcoded
+        {
             this.setDead(true);
         }
 
@@ -184,11 +182,17 @@ public class Rabbit
         }
     }
 
+    @Override
+    public String toString()
+    {
+        return (this.sex == Sex.FEMALE ? "F_" : "M_");
+    }
+
 //    @Override
 //    public String toString()
 //    {
-//        return "Rabbit{" + "MAX_AGE_MONTHS=" + MAX_AGE_MONTHS + ", sex=" + sex + ", fertilityStart=" + fertilityStart +
-//               ", isFertile=" + isFertile + ", ageMonths=" + ageMonths + ", monthlyMortality=" + monthlyMortality +
-//               ", isDead=" + isDead + ", isMature=" + isMature + ", isDue=" + isDue + '}';
+//        return "Rabbit{" + "sex=" + sex + ", fertilityStart=" + fertilityStart + ", isFertile=" + isFertile +
+//               ", ageMonths=" + ageMonths + ", monthlyMortality=" + monthlyMortality + ", isDead=" + isDead +
+//               ", isMature=" + isMature + ", isDue=" + isDue + '}';
 //    }
 }

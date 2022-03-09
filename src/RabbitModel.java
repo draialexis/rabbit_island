@@ -1,59 +1,62 @@
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class RabbitModel
 {
-    private ArrayList<Rabbit> maleRabbits;
-    private ArrayList<Rabbit> femaleRabbits;
-    private static final int MONTHS = 24;
+    private final ArrayList<Rabbit> rabbits;
+    private static final int MONTHS = 30;
 
     public RabbitModel(int numFem, int numMal)
     {
-        this.femaleRabbits = new ArrayList<>();
-        this.maleRabbits = new ArrayList<>();
+        this.rabbits = new ArrayList<>();
         for (int i = 0; i < numFem; i++)
         {
-            femaleRabbits.add(new Rabbit(Sex.FEMALE));
+            this.rabbits.add(new Rabbit(Sex.FEMALE));
         }
         for (int i = 0; i < numMal; i++)
         {
-            maleRabbits.add(new Rabbit(Sex.MALE));
-        }
-    }
-
-    private void step(Rabbit rabbit)
-    {
-        rabbit.ageUp();
-        if (rabbit.isDead())
-        {
-            this.femaleRabbits.remove(rabbit);
+            this.rabbits.add(new Rabbit(Sex.MALE));
         }
     }
 
     void run()
     {
-        for (int i = MONTHS; i >= 0; i--)
+        for (int i = MONTHS; i > 0; i--)
         {
-            for (Rabbit doe : this.femaleRabbits)
+            Iterator<Rabbit> itr = this.rabbits.iterator();
+            while (itr.hasNext())
             {
-                this.step(doe);
+                Rabbit rabbit = itr.next();
+                rabbit.ageUp();
+                if (rabbit.isDead())
+                {
+                    itr.remove();
+                }
+                if (rabbit.isDue()) // not taking the presence of males into account, to improve performance
+                {
+                    this.giveBirth();
+                }
             }
-            for (Rabbit buck : this.maleRabbits)
-            {
-                this.step(buck);
-            }
+            System.out.println(this.rabbits.size());
         }
     }
 
     private void giveBirth()
     {
-        int n = 4; // rdm [2;6] _normal
-        for (Rabbit doe : this.femaleRabbits)
+        double f = Math.random() / Math.nextDown(1.0);
+        int n = (int) (2 * (1.0 - f) + 7 * f);
+        // TODO rdm in [2;6] _normal
+        for (Rabbit rabbit : this.rabbits)
         {
-            for (int i = 0; i < n; i++)
+            if (rabbit.isDue())
             {
-                if (doe.isFertile() && doe.isDue())
+                if (rabbit.getSex() == Sex.MALE || !rabbit.isFertile())
                 {
-
+                    throw new RuntimeException("wuh-oh, infertile or male rabbit giving birth");
+                }
+                for (int i = 0; i < n; i++)
+                {
+                    rabbits.add(new Rabbit());
                 }
             }
         }
