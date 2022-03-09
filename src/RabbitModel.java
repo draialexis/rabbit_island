@@ -19,6 +19,23 @@ public class RabbitModel
         }
     }
 
+    /*
+    If we want to keep our for-each loop, then we can. It's just that we need to wait until after iterating before we remove the elements. Let's try this out by adding what we want to remove to a toRemove list as we iterate:
+
+    List<Integer> integers = newArrayList(1, 2, 3);
+    List<Integer> toRemove = newArrayList();
+
+    for (Integer integer : integers) {
+        if(integer == 2) {
+            toRemove.add(integer);
+        }
+    }
+    integers.removeAll(toRemove);
+
+    assertThat(integers).containsExactly(1, 3);
+    This is another effective way of getting around the problem.
+
+     */
     void run()
     {
         for (int i = MONTHS; i > 0; i--)
@@ -31,33 +48,71 @@ public class RabbitModel
                 if (rabbit.isDead())
                 {
                     itr.remove();
+                    continue;
                 }
-                if (rabbit.isDue()) // not taking the presence of males into account, to improve performance
-                {
-                    this.giveBirth();
-                }
+
+                this.giveBirth();
             }
             System.out.println(this.rabbits.size());
         }
     }
 
+    /*
+
+    If we want to keep our for-each loop, then we can. It's just that we need to wait until after iterating before we remove the elements. Let's try this out by adding what we want to remove to a toRemove list as we iterate:
+
+List<Integer> integers = newArrayList(1, 2, 3);
+List<Integer> toRemove = newArrayList();
+
+for (Integer integer : integers) {
+    if(integer == 2) {
+        toRemove.add(integer);
+    }
+}
+integers.removeAll(toRemove);
+
+assertThat(integers).containsExactly(1, 3);
+This is another effective way of getting around the problem.
+
+     */
     private void giveBirth()
     {
-        double f = Math.random() / Math.nextDown(1.0);
-        int n = (int) (2 * (1.0 - f) + 7 * f);
-        // TODO rdm in [2;6] _normal
-        for (Rabbit rabbit : this.rabbits)
+
+        Iterator<Rabbit> itr = this.rabbits.iterator();
+        while (itr.hasNext())
         {
-            if (rabbit.isDue())
+            Rabbit rabbit = itr.next();
+            int littersDue = rabbit.getYearlyDue();
+            for (int i = 0; i < littersDue; i++)
+            // not taking the presence of males into account, to improve performance
             {
-                if (rabbit.getSex() == Sex.MALE || !rabbit.isFertile())
+                if (Math.random() < 0.15)
                 {
-                    throw new RuntimeException("wuh-oh, infertile or male rabbit giving birth");
-                }
-                for (int i = 0; i < n; i++)
+                    rabbit.kill();
+                    itr.remove();
+                    continue;
+                } else
                 {
-                    rabbits.add(new Rabbit());
+                    double f;
+                    int n;
+                    f = Math.random() / Math.nextDown(1.0);
+                    n = (int) (2 * (1.0 - f) + 7 * f);
+                    System.out.println("giving birth to " + n);
+                    // TODO rdm in [2;6] _normal
+                    if (rabbit.getSex() == Sex.FEMALE && rabbit.isFertile())
+                    {
+                        for (int j = 0; j < n; j++)
+                        {
+                            rabbits.add(new Rabbit());
+                        }
+                    }
+
                 }
+                System.out.println(this.rabbits.size());
+                rabbit.resetYearlyDue();
+                // TODO improve that to prevent inaccuracy (use array as litter planner?)
+                // as it stands, a female that is due x litters in the next 12 months will spawn them all
+                // even if she should die the following month
             }
         }
     }

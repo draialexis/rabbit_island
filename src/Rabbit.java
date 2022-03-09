@@ -1,6 +1,3 @@
-import java.util.HashMap;
-import java.util.Map;
-
 enum Sex
 {
     FEMALE, MALE
@@ -8,45 +5,53 @@ enum Sex
 
 public class Rabbit
 {
-    private final short MAX_AGE_MONTHS = 156;
-    private final Sex sex;
+    private static final short MAX_AGE_MONTHS = 156;
+    private static final double[] yearlyMortalities = {0.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.4, 0.55, 0.7,
+                                                       0.85, 1.0};
+    private static final double[] monthlyMortalities = new double[MAX_AGE_MONTHS];
+
+    static
+    {
+        int k = 0;
+        for (double yearlyMortality : yearlyMortalities)
+        {
+            for (int i = 0; i < 12; i++)
+            {
+                monthlyMortalities[k++] = (Math.pow((1 + yearlyMortality), (1 / 12.0)) - 1);
+            }
+        }
+    }
+
     private final int fertilityStart;
+    private final boolean canBeFertile;
+
     private boolean isFertile;
+    private final Sex sex;
     private short ageMonths;
     private double monthlyMortality;
     private boolean isDead;
     private boolean isMature;
-    private boolean isDue;
-    private static Map<Character, Double> yearlyMortality;
-
-    static
-    {
-        yearlyMortality = new HashMap<>();
-        yearlyMortality.put('k', 0.5);  // kid 0.5
-        yearlyMortality.put('m', 0.25); // mature
-        yearlyMortality.put('1', 0.4);  // mature + 1 ([8,  9 [ yo)
-        yearlyMortality.put('2', 0.55); // mature + 2 ([9,  10[ yo)
-        yearlyMortality.put('3', 0.7);  // mature + 3 ([10, 11[ yo)
-        yearlyMortality.put('4', 0.85); // mature + 4 ([11, 12[ yo)
-        yearlyMortality.put('5', 1.0);  // mature + 5 ([12, 13[ yo)
-    }
+    private int yearlyDue;
 
     Rabbit()
     {
         this(Math.random() < 0.5 ? Sex.FEMALE : Sex.MALE);
     }
 
-    Rabbit(Sex s)
+    Rabbit(Sex sex)
     {
         double f = Math.random() / Math.nextDown(1.0);
-        this.sex = s;
         this.fertilityStart = (int) (5 * (1.0 - f) + 9 * f);
-        // TODO rdm in [5;8] _continuous + rdm 10% infertile females _continuous
+        // TODO rdm in [5;8] _continuous
+        this.canBeFertile = sex != Sex.FEMALE || !(Math.random() >= 0.9);
+        // TODO rdm 10% infertile females _continuous
         this.isFertile = false;
+        this.sex = sex;
         this.ageMonths = 0;
+        this.monthlyMortality = monthlyMortalities[0];
         this.isDead = false;
         this.isMature = false;
-        this.isDue = false;
+        this.yearlyDue = 0;
     }
 
     public boolean isFertile()
@@ -54,54 +59,9 @@ public class Rabbit
         return this.isFertile;
     }
 
-    public void setFertile(boolean fertile)
-    {
-        this.isFertile = fertile;
-    }
-
-    public int getFertilityStart()
-    {
-        return this.fertilityStart;
-    }
-
-    public short getAgeMonths()
-    {
-        return this.ageMonths;
-    }
-
-    public void setAgeMonths(short ageMonths)
-    {
-        this.ageMonths = ageMonths;
-    }
-
-    double getMonthlyMortality()
-    {
-        return this.monthlyMortality;
-    }
-
-    void setMonthlyMortality(double monthlyMortality)
-    {
-        this.monthlyMortality = monthlyMortality;
-    }
-
     public boolean isDead()
     {
         return this.isDead;
-    }
-
-    public void setDead(boolean dead)
-    {
-        this.isDead = dead;
-    }
-
-    boolean isMature()
-    {
-        return this.isMature;
-    }
-
-    void setMature(boolean mature)
-    {
-        this.isMature = mature;
     }
 
     public Sex getSex()
@@ -109,77 +69,90 @@ public class Rabbit
         return this.sex;
     }
 
-    public boolean isDue()
+    public int getYearlyDue()
     {
-        return this.isDue;
+        return yearlyDue;
     }
 
-    public void setDue(boolean due)
+    public void resetYearlyDue()
     {
-        this.isDue = due;
+        this.yearlyDue = 0;
     }
 
-    void updateMonthlyMortality()
+    void kill()
     {
-        for (int i = 1; i <= MAX_AGE_MONTHS; i++)
+        System.out.println("eep!");
+        this.isDead = true;
+    }
+
+    private void updateMonthlyMortality()
+    {
+        if (this.ageMonths < MAX_AGE_MONTHS)
         {
-            char ch = 0;
-            if (!(this.isMature()))
-            {
-                ch = 'k';
-            } else if (i <= 84)
-            {
-                ch = 'm';
-            } else if (i <= 96)
-            {
-                ch = '1';
-            } else if (i <= 108)
-            {
-                ch = '2';
-            } else if (i <= 120)
-            {
-                ch = '3';
-            } else if (i <= 132)
-            {
-                ch = '4';
-            } else if (i <= 144)
-            {
-                ch = '5';
-            }
-            if (ch == 0)
-            {
-                throw new RuntimeException("could not establish rabbit monthly mortality rate");
-            } else
-            {
-                this.setMonthlyMortality(Math.pow((1 + yearlyMortality.get(ch)), (1 / 12.0)) - 1);
-            }
+            this.monthlyMortality = monthlyMortalities[this.ageMonths];
         }
+    }
+
+    private void updateMature()
+    {
+        if (this.ageMonths == this.fertilityStart)
+        {
+            this.isMature = true;
+        }
+    }
+
+    private void updateFertile()
+    {
+        if (this.isMature && this.canBeFertile)
+        {
+            this.isFertile = true;
+        }
+    }
+
+    private void updateDead()
+    {
+        // TODO rdm [0;1] _continuous
+        if (this.ageMonths == MAX_AGE_MONTHS || Math.random() < this.monthlyMortality)
+        {
+            this.kill();
+        }
+        // if below mortality rate kill
+    }
+
+    private void updateYearlyDue()
+    {
+        double f = Math.random() / Math.nextDown(1.0);
+        this.yearlyDue = (int) (3 * (1.0 - f) + 10 * f);
+        // TODO rdm [3;9] _normal
+        // TODO improve that to prevent inaccuracy (use array as litter planner?)
+        // as it stands, a female that is due x litters in the next 12 months will spawn them all
+        // even if she should die the following month
     }
 
     void ageUp()
     {
         this.ageMonths++;
-        double rdm = Math.random(); //rdm [0;1] _continuous
-        // TODO get better PRNG
 
-        if (this.ageMonths == this.fertilityStart)
+        this.updateDead();
+
+        if (!(this.isMature))
         {
-            this.mature();
+            this.updateMature();
         }
-        this.updateMonthlyMortality();
-        if (this.ageMonths == MAX_AGE_MONTHS || rdm < this.monthlyMortality)
-        {
-            this.setDead(true);
-        }
-
-    }
-
-    private void mature()
-    {
         if (!(this.isFertile))
         {
-            this.setFertile(true);
+            this.updateFertile();
         }
+
+        if (this.sex == Sex.FEMALE && this.isFertile && this.ageMonths % 12 == 0)
+        {
+            // TODO improve that to prevent inaccuracy (use array as litter planner?)
+            // as it stands, a female that is due x litters in the next 12 months will spawn them all
+            // even if she should die the following month
+            this.updateYearlyDue();
+        }
+
+        this.updateMonthlyMortality();
     }
 
     @Override
@@ -187,12 +160,4 @@ public class Rabbit
     {
         return (this.sex == Sex.FEMALE ? "F_" : "M_");
     }
-
-//    @Override
-//    public String toString()
-//    {
-//        return "Rabbit{" + "sex=" + sex + ", fertilityStart=" + fertilityStart + ", isFertile=" + isFertile +
-//               ", ageMonths=" + ageMonths + ", monthlyMortality=" + monthlyMortality + ", isDead=" + isDead +
-//               ", isMature=" + isMature + ", isDue=" + isDue + '}';
-//    }
 }
