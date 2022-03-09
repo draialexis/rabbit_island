@@ -16,5 +16,12 @@ public class Main
             }
         }
 
+        // 2)
+
+        RabbitModel model = new RabbitModel(5, 5);
+
+        model.run();
+
     }
+
 }
