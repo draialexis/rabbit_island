@@ -5,6 +5,8 @@ enum Sex
 
 public class Rabbit
 {
+    public static long pop = 0;
+
     private static final short MAX_AGE_MONTHS = 156;
     private static final double[] yearlyMortalities = {0.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.4, 0.55, 0.7,
                                                        0.85, 1.0};
@@ -17,7 +19,9 @@ public class Rabbit
         {
             for (int i = 0; i < 12; i++)
             {
-                monthlyMortalities[k++] = (Math.pow((1 + yearlyMortality), (1 / 12.0)) - 1);
+                double m = (Math.pow((1 + yearlyMortality), (1 / 12.0)) - 1);
+                System.out.println(k + " : " + m);
+                monthlyMortalities[k++] = m;
             }
         }
     }
@@ -28,7 +32,6 @@ public class Rabbit
     private boolean isFertile;
     private final Sex sex;
     private short ageMonths;
-    private double monthlyMortality;
     private boolean isDead;
     private boolean isMature;
     private int yearlyDue;
@@ -48,10 +51,10 @@ public class Rabbit
         this.isFertile = false;
         this.sex = sex;
         this.ageMonths = 0;
-        this.monthlyMortality = monthlyMortalities[0];
         this.isDead = false;
         this.isMature = false;
         this.yearlyDue = 0;
+        pop++;
     }
 
     public boolean isFertile()
@@ -79,18 +82,10 @@ public class Rabbit
         this.yearlyDue = 0;
     }
 
-    void kill()
+    public void kill()
     {
-        System.out.println("eep!");
         this.isDead = true;
-    }
-
-    private void updateMonthlyMortality()
-    {
-        if (this.ageMonths < MAX_AGE_MONTHS)
-        {
-            this.monthlyMortality = monthlyMortalities[this.ageMonths];
-        }
+        pop--;
     }
 
     private void updateMature()
@@ -112,11 +107,11 @@ public class Rabbit
     private void updateDead()
     {
         // TODO rdm [0;1] _continuous
-        if (this.ageMonths == MAX_AGE_MONTHS || Math.random() < this.monthlyMortality)
+        double rdm = Math.random();
+        if (this.ageMonths == MAX_AGE_MONTHS || rdm < monthlyMortalities[this.ageMonths])
         {
             this.kill();
         }
-        // if below mortality rate kill
     }
 
     private void updateYearlyDue()
@@ -129,7 +124,7 @@ public class Rabbit
         // even if she should die the following month
     }
 
-    void ageUp()
+    public void ageUp()
     {
         this.ageMonths++;
 
@@ -151,8 +146,6 @@ public class Rabbit
             // even if she should die the following month
             this.updateYearlyDue();
         }
-
-        this.updateMonthlyMortality();
     }
 
     @Override

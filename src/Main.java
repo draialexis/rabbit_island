@@ -18,7 +18,7 @@ public class Main
 
         // 2)
 
-        RabbitModel model = new RabbitModel(3, 3);
+        RabbitModel model = new RabbitModel(3, 2);
 
         model.run();
 
