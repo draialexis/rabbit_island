@@ -18,7 +18,6 @@ public class SimpleRabbitSim
         if (months == 1 || months == 2)
         {
             System.out.println("Month: " + months + " | Pop: " + 1);
-            // System.out.print(1 + ", ");
             return 1;
         }
         for (int i = 3; i <= months; i++)
@@ -30,7 +29,6 @@ public class SimpleRabbitSim
         }
         // step4: display
         System.out.println("Month: " + months + " | Pop: " + current);
-        // System.out.print(current + ", ");
         return current;
     }
 }
