@@ -3,7 +3,7 @@ public class Main
     public static void main(String[] args)
     {
 
-        // 1)
+        System.out.println("///// 1) Simple rabbit pop sim /////");
 
         long pop;
         for (int i = 1; i <= 240; i++)
@@ -16,14 +16,14 @@ public class Main
             }
         }
 
-        // 2)
+        System.out.println("///// 2) Dank ill rabbit pop sim /////");
 
         for (int i = 1; i <= 50; i++)
         {
-            RabbitModel model = new RabbitModel(7, 3);
-            model.run(i);
+            RabbitModel model = new RabbitModel(6, 4);
+            model.run(i, 20);
         }
-
+        //TODO doc
     }
 
 }
