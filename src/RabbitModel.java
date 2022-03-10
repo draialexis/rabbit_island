@@ -20,11 +20,11 @@ public class RabbitModel
         this.rabbits = new ArrayList<>();
         for (int i = 0; i < numFem; i++)
         {
-            this.rabbits.add(new Rabbit(Sex.FEMALE));
+            this.rabbits.add(new Rabbit('f'));
         }
         for (int i = 0; i < numMal; i++)
         {
-            this.rabbits.add(new Rabbit(Sex.MALE));
+            this.rabbits.add(new Rabbit('m'));
         }
     }
 
@@ -32,20 +32,20 @@ public class RabbitModel
     {
         int    duration = Rabbit.MONTHS_IN_YEAR * years;
         String fileName = "rabbits" + duration + "m_i" + i + ".csv";
+
         FileStuff.createFile(fileName);
         FileStuff.writeToFile(fileName, "births;deaths");
+
         for (int j = 1; j <= duration; j++)
         {
             this.stepAge();
             this.stepBirths();
             FileStuff.writeToFile(fileName, Rabbit.births + ";" + Rabbit.deaths);
-            if (Rabbit.births == Rabbit.deaths) // extinction... keep that result too? what are we doing here?
-            {
-                break;
-            }
         }
+
         Rabbit.births = 0;
         Rabbit.deaths = 0;
+
         // TODO calculate variance, mean, confidence interval etc. for final pops
         // TODO show graphs
     }
@@ -68,7 +68,7 @@ public class RabbitModel
     {
         for (Rabbit rabbit : this.rabbits)
         {
-            if (rabbit.getSex() == Sex.FEMALE && rabbit.isFertile())
+            if (rabbit.getSex() == 'f' && rabbit.isFertile())
             {
                 boolean[] willSpawn       = rabbit.getWillSpawn();
                 int       ageWithoutYears = rabbit.getAgeMonths() % Rabbit.MONTHS_IN_YEAR;
@@ -83,7 +83,7 @@ public class RabbitModel
                     {
                         double rdm = mt.nextGaussian() * Rabbit.STD_DEVIATION_LITTERS_PER_YEAR +
                                      Rabbit.MEAN_LITTERS_PER_YEAR;
-                        int    n   = (int) Math.round(rdm);
+                        int n = (int) Math.round(rdm);
                         for (int k = 0; k < n; k++)
                         {
                             this.toAdd.add(new Rabbit());
