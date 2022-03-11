@@ -1,10 +1,11 @@
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class RabbitModel
 {
-    private final ArrayList<Rabbit> rabbits;
-    private final ArrayList<Rabbit> toRemove;
-    private final ArrayList<Rabbit> toAdd;
+    private final LinkedList<Rabbit> rabbits;
+    private final LinkedList<Rabbit> toRemove;
+    private final LinkedList<Rabbit> toAdd;
 
     private long births;
     private long deaths;
@@ -12,9 +13,9 @@ public class RabbitModel
     public RabbitModel(int numFem, int numMal)
     {
         char sex;
-        this.toRemove = new ArrayList<>();
-        this.toAdd = new ArrayList<>();
-        this.rabbits = new ArrayList<>();
+        this.toRemove = new LinkedList<>();
+        this.toAdd = new LinkedList<>();
+        this.rabbits = new LinkedList<>();
         this.births = 0;
         this.deaths = 0;
         for (int i = 0; i < numFem + numMal; i++)
@@ -68,60 +69,50 @@ public class RabbitModel
         //        for (int j = 1; j <= Rabbit.MONTHS_IN_YEAR * years; j++)
         for (int j = 1; j <= duration; j++)
         {
-            this.stepAge();
-            this.stepBirths();
-            FileStuff.writeToFile(fileName, this.births + ";" + this.deaths);// TODO remove before shipping
-        }
-        return this.births - this.deaths;
-        // TODO show graphs
-    }
-
-    private void stepAge()
-    {
-        for (Rabbit rabbit : this.rabbits)
-        {
-            rabbit.ageUp();
-            if (rabbit.isDead())
+            for (Rabbit rabbit : this.rabbits)
             {
-                unmakeRabbit(rabbit);
-                this.toRemove.add(rabbit);
-            }
-        }
-        this.rabbits.removeAll(this.toRemove); // removing inactive cells to avoid stack-overflow and performance issues
-        this.toRemove.clear();
-    }
-
-    private void stepBirths()
-    {
-        for (Rabbit rabbit : this.rabbits)
-        {
-            if (rabbit.getSex() == 'f' && rabbit.isFertile())
-            {
-                boolean[] willSpawn       = rabbit.getWillSpawn();
-                int       ageWithoutYears = rabbit.getAgeMonths() % Rabbit.MONTHS_IN_YEAR;
-                if (willSpawn[ageWithoutYears])
+                rabbit.ageUp(); // ageing rabbits first
+                if (rabbit.isDead())
                 {
-                    if (Main.mt.nextBoolean(Rabbit.DEATH_IN_LABOR_RATE)) // death during labor also kills the offspring
+                    unmakeRabbit(rabbit);
+                    this.toRemove.add(rabbit);
+                }
+                // then checking for births
+                if (!(rabbit.isDead()) && rabbit.getSex() == 'f' && rabbit.isFertile())
+                {
+                    boolean[] willSpawn       = rabbit.getWillSpawn();
+                    int       ageWithoutYears = rabbit.getAgeMonths() % Rabbit.MONTHS_IN_YEAR;
+                    if (willSpawn[ageWithoutYears])
                     {
-                        unmakeRabbit(rabbit);
-                        this.toRemove.add(rabbit);
-                    }
-                    else
-                    {
-                        double rdm = Main.mt.nextGaussian() * Rabbit.STD_DEVIATION_LITTERS_PER_YEAR +
-                                     Rabbit.MEAN_LITTERS_PER_YEAR;
-                        int n = (int) Math.round(rdm);
-                        for (int k = 0; k < n; k++)
+                        if (Main.mt.nextBoolean(Rabbit.DEATH_IN_LABOR_RATE)) // death during labor also kills the offspring
                         {
-                            this.toAdd.add(makeRabbit('r'));
+                            unmakeRabbit(rabbit);
+                            this.toRemove.add(rabbit);
+                        }
+                        else
+                        {
+                            double rdm = Main.mt.nextGaussian()
+                                         * Rabbit.STD_DEVIATION_LITTERS_PER_YEAR
+                                         + Rabbit.MEAN_LITTERS_PER_YEAR;
+                            int n = (int) Math.round(rdm); // explicitly casting long into an int
+                            for (int k = 0; k < n; k++)
+                            {
+                                this.toAdd.add(makeRabbit('r')); // random sex
+                            }
                         }
                     }
                 }
             }
+            // using auxiliary lists, for pop evolution, to avoid concurrent modification errors at runtime
+            // & removing inactive cells to avoid stack-overflow and performance issues
+            this.rabbits.removeAll(this.toRemove);
+            this.toRemove.clear();
+            this.rabbits.addAll(this.toAdd);
+            this.toAdd.clear();
+
+            FileStuff.writeToFile(fileName, this.births + ";" + this.deaths);// TODO remove before shipping
         }
-        this.rabbits.removeAll(this.toRemove);// removing inactive cells to avoid stack-overflow and performance issues
-        this.toRemove.clear();
-        this.rabbits.addAll(this.toAdd);
-        this.toAdd.clear();
+        return this.births - this.deaths;
+        // TODO show graphs
     }
 }
