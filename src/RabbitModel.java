@@ -13,19 +13,55 @@ public class RabbitModel
         mt = new MersenneTwisterFast(new int[]{0x123, 0x234, 0x345, 0x456});
     }
 
+    private long births;
+    private long deaths;
+
     public RabbitModel(int numFem, int numMal)
     {
+        char sex;
         this.toRemove = new ArrayList<>();
         this.toAdd = new ArrayList<>();
         this.rabbits = new ArrayList<>();
-        for (int i = 0; i < numFem; i++)
+        this.births = 0;
+        this.deaths = 0;
+        for (int i = 0; i < numFem + numMal; i++)
         {
-            this.rabbits.add(new Rabbit('f'));
+            if (i < numFem)
+            {
+                sex = 'f';
+            }
+            else
+            {
+                sex = 'm';
+            }
+            this.rabbits.add(makeRabbit(sex));
         }
-        for (int i = 0; i < numMal; i++)
+    }
+
+    private Rabbit makeRabbit(char sex)
+    {
+        this.births++;
+        if (sex == 'f' || sex == 'm') //male or female
         {
-            this.rabbits.add(new Rabbit('m'));
+            return new Rabbit(sex);
         }
+        else
+        {
+            if (sex == 'r') //random
+            {
+                return new Rabbit();
+            }
+            else
+            {
+                throw new RuntimeException("can't make a rabbit like that");
+            }
+        }
+    }
+
+    private void unmakeRabbit(Rabbit rabbit)
+    {
+        this.deaths++;
+        rabbit.kill();
     }
 
     void run(int i, int years)
@@ -40,11 +76,8 @@ public class RabbitModel
         {
             this.stepAge();
             this.stepBirths();
-            FileStuff.writeToFile(fileName, Rabbit.births + ";" + Rabbit.deaths);
+            FileStuff.writeToFile(fileName, this.births + ";" + this.deaths);
         }
-
-        Rabbit.births = 0;
-        Rabbit.deaths = 0;
 
         // TODO calculate variance, mean, confidence interval etc. for final pops
         // TODO show graphs
@@ -57,6 +90,7 @@ public class RabbitModel
             rabbit.ageUp();
             if (rabbit.isDead())
             {
+                this.deaths++;
                 this.toRemove.add(rabbit);
             }
         }
@@ -76,7 +110,7 @@ public class RabbitModel
                 {
                     if (mt.nextBoolean(Rabbit.DEATH_IN_LABOR_RATE)) // death during labor also kills the offspring
                     {
-                        rabbit.kill();
+                        unmakeRabbit(rabbit);
                         this.toRemove.add(rabbit);
                     }
                     else
@@ -86,7 +120,8 @@ public class RabbitModel
                         int n = (int) Math.round(rdm);
                         for (int k = 0; k < n; k++)
                         {
-                            this.toAdd.add(new Rabbit());
+                            this.toAdd.add(makeRabbit('r'));
+                            this.births++;
                         }
                     }
                 }

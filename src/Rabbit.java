@@ -29,9 +29,6 @@ public class Rabbit
             1.0      // [12;13[
     };
 
-    static long deaths = 0;
-    static long births = 0;
-
     static
     {
         // calculating all constant mortality rates at compile time to improve performance
@@ -76,8 +73,6 @@ public class Rabbit
         this.isDead = false;
         this.ageMonths = 0;
         this.yearlyDue = 0;
-
-        births++;
     }
 
     public boolean isFertile()
@@ -108,7 +103,6 @@ public class Rabbit
     public void kill()
     {
         this.isDead = true;
-        deaths++;
     }
 
     private void updateDead()
