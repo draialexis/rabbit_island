@@ -5,13 +5,7 @@ public class RabbitModel
     private final ArrayList<Rabbit>   rabbits;
     private final ArrayList<Rabbit>   toRemove;
     private final ArrayList<Rabbit>   toAdd;
-    static final  MersenneTwisterFast mt;
 
-    static
-    {
-        // initializing the Mersenne Twister
-        mt = new MersenneTwisterFast(new int[]{0x123, 0x234, 0x345, 0x456});
-    }
 
     private long births;
     private long deaths;
@@ -107,14 +101,14 @@ public class RabbitModel
                 int       ageWithoutYears = rabbit.getAgeMonths() % Rabbit.MONTHS_IN_YEAR;
                 if (willSpawn[ageWithoutYears])
                 {
-                    if (mt.nextBoolean(Rabbit.DEATH_IN_LABOR_RATE)) // death during labor also kills the offspring
+                    if (Main.mt.nextBoolean(Rabbit.DEATH_IN_LABOR_RATE)) // death during labor also kills the offspring
                     {
                         unmakeRabbit(rabbit);
                         this.toRemove.add(rabbit);
                     }
                     else
                     {
-                        double rdm = mt.nextGaussian() * Rabbit.STD_DEVIATION_LITTERS_PER_YEAR +
+                        double rdm = Main.mt.nextGaussian() * Rabbit.STD_DEVIATION_LITTERS_PER_YEAR +
                                      Rabbit.MEAN_LITTERS_PER_YEAR;
                         int n = (int) Math.round(rdm);
                         for (int k = 0; k < n; k++)

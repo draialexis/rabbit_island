@@ -60,13 +60,13 @@ public class Rabbit
 
     Rabbit()
     {
-        this(RabbitModel.mt.nextDouble() < 0.5 ? 'f' : 'm');
+        this(Main.mt.nextDouble() < 0.5 ? 'f' : 'm');
     }
 
     Rabbit(char sex)
     {
-        this.fertilityStart = RabbitModel.mt.nextInt(INTERVAL_FERTILITY_START + 1) + EARLIEST_FERTILITY_START;
-        this.canBeFertile = sex != 'f' || RabbitModel.mt.nextBoolean(FEMALE_FERTILITY_PROB);
+        this.fertilityStart = Main.mt.nextInt(INTERVAL_FERTILITY_START + 1) + EARLIEST_FERTILITY_START;
+        this.canBeFertile = sex != 'f' || Main.mt.nextBoolean(FEMALE_FERTILITY_PROB);
         this.willSpawn = new boolean[MONTHS_IN_YEAR];
         this.sex = sex;
 
@@ -109,7 +109,7 @@ public class Rabbit
 
     private void updateDead()
     {
-        double rdm = RabbitModel.mt.nextDouble(true, true);
+        double rdm = Main.mt.nextDouble(true, true);
         if
         (
             // death from old age
@@ -138,7 +138,7 @@ public class Rabbit
 
     private void updateYearlyDue()
     {
-        double rdm = (RabbitModel.mt.nextGaussian() * STD_DEVIATION_KITS_PER_LITTER + MEAN_KITS_PER_LITTER);
+        double rdm = (Main.mt.nextGaussian() * STD_DEVIATION_KITS_PER_LITTER + MEAN_KITS_PER_LITTER);
         this.yearlyDue = (int) Math.round(rdm);
 
         int toBeSpawned = 0;

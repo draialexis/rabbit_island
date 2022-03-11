@@ -3,6 +3,14 @@ import java.util.OptionalLong;
 
 public class Main
 {
+    static final  MersenneTwisterFast mt;
+
+    static
+    {
+        // initializing the Mersenne Twister
+        mt = new MersenneTwisterFast(new int[]{0x123, 0x234, 0x345, 0x456});
+    }
+
     public static void main(String[] args)
     {
 
