@@ -11,10 +11,10 @@ public class FileStuff
             {
                 System.out.println("File created: " + myObj.getName());
             }
-            else
-            {
-                throw new RuntimeException("file already exists");
-            }
+            else// TODO remove before shipping
+            {// TODO remove before shipping
+                throw new RuntimeException("file already exists");// TODO remove before shipping
+            }// TODO remove before shipping
         } catch (IOException e)
         {
             System.out.println("file creating error");

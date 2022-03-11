@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 public class Rabbit
 {
     static final int    MONTHS_IN_YEAR                 = 12;
@@ -114,7 +116,7 @@ public class Rabbit
                 (this.ageMonths == MAX_AGE_MONTHS)
                 ||
                 (
-                        // death at < 1 year old: monthly mortality rate depends on maturity, depends on individual
+                        // death before 1 year: monthly mortality rate depends on maturity, which depends on individual
                         (this.ageMonths < MONTHS_IN_YEAR)
                         &&
                         ((this.isMature && (rdm < Math.pow((1 + 0.5), (1 / 12.0)) - 1))
@@ -123,14 +125,14 @@ public class Rabbit
                 )
                 ||
                 (
-                        // death from monthly mortality rates calculated at compile-time
+                        // death from other monthly mortality rates which were calculated at compile-time
                         (this.ageMonths >= MONTHS_IN_YEAR)
                         &&
                         (rdm < MONTHLY_MORTALITIES[this.ageMonths - MONTHS_IN_YEAR])
                 )
         )
         {
-            this.kill();
+            this.isDead = true;
         }
     }
 

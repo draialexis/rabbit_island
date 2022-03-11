@@ -41,13 +41,13 @@ public class RabbitModel
     private Rabbit makeRabbit(char sex)
     {
         this.births++;
-        if (sex == 'f' || sex == 'm') //male or female
+        if (sex == 'f' || sex == 'm') // male or female
         {
             return new Rabbit(sex);
         }
         else
         {
-            if (sex == 'r') //random
+            if (sex == 'r') // random
             {
                 return new Rabbit();
             }
@@ -64,22 +64,21 @@ public class RabbitModel
         rabbit.kill();
     }
 
-    void run(int i, int years)
+    long run(int i, int years)
     {
-        int    duration = Rabbit.MONTHS_IN_YEAR * years;
-        String fileName = "rabbits" + duration + "m_i" + i + ".csv";
+        int    duration = Rabbit.MONTHS_IN_YEAR * years;// TODO remove before shipping
+        String fileName = "rabbits" + duration + "m_i" + i + ".csv";// TODO remove before shipping
 
-        FileStuff.createFile(fileName);
-        FileStuff.writeToFile(fileName, "births;deaths");
+        FileStuff.createFile(fileName);// TODO remove before shipping
+        FileStuff.writeToFile(fileName, "births;deaths");// TODO remove before shipping
 
         for (int j = 1; j <= duration; j++)
         {
             this.stepAge();
             this.stepBirths();
-            FileStuff.writeToFile(fileName, this.births + ";" + this.deaths);
+            FileStuff.writeToFile(fileName, this.births + ";" + this.deaths);// TODO remove before shipping
         }
-
-        // TODO calculate variance, mean, confidence interval etc. for final pops
+        return this.births - this.deaths;
         // TODO show graphs
     }
 
@@ -90,11 +89,11 @@ public class RabbitModel
             rabbit.ageUp();
             if (rabbit.isDead())
             {
-                this.deaths++;
+                unmakeRabbit(rabbit);
                 this.toRemove.add(rabbit);
             }
         }
-        this.rabbits.removeAll(this.toRemove);
+        this.rabbits.removeAll(this.toRemove); // removing inactive cells to avoid stack-overflow and performance issues
         this.toRemove.clear();
     }
 
@@ -121,13 +120,12 @@ public class RabbitModel
                         for (int k = 0; k < n; k++)
                         {
                             this.toAdd.add(makeRabbit('r'));
-                            this.births++;
                         }
                     }
                 }
             }
         }
-        this.rabbits.removeAll(this.toRemove);
+        this.rabbits.removeAll(this.toRemove);// removing inactive cells to avoid stack-overflow and performance issues
         this.toRemove.clear();
         this.rabbits.addAll(this.toAdd);
         this.toAdd.clear();
