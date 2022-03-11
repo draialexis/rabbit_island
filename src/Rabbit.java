@@ -1,5 +1,3 @@
-import java.util.Arrays;
-
 public class Rabbit
 {
     static final int    MONTHS_IN_YEAR                 = 12;
