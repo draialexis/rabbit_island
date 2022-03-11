@@ -2,10 +2,9 @@ import java.util.ArrayList;
 
 public class RabbitModel
 {
-    private final ArrayList<Rabbit>   rabbits;
-    private final ArrayList<Rabbit>   toRemove;
-    private final ArrayList<Rabbit>   toAdd;
-
+    private final ArrayList<Rabbit> rabbits;
+    private final ArrayList<Rabbit> toRemove;
+    private final ArrayList<Rabbit> toAdd;
 
     private long births;
     private long deaths;
@@ -66,6 +65,7 @@ public class RabbitModel
         FileStuff.createFile(fileName);// TODO remove before shipping
         FileStuff.writeToFile(fileName, "births;deaths");// TODO remove before shipping
 
+        //        for (int j = 1; j <= Rabbit.MONTHS_IN_YEAR * years; j++)
         for (int j = 1; j <= duration; j++)
         {
             this.stepAge();

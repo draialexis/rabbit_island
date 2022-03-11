@@ -140,13 +140,16 @@ public class Rabbit
         this.yearlyDue = (int) Math.round(rdm);
 
         int toBeSpawned = 0;
-        int period      = MONTHS_IN_YEAR / this.yearlyDue;
-
-        for (int i = 0; i < MONTHS_IN_YEAR && toBeSpawned < this.yearlyDue; i += period)
-        {
-            willSpawn[i] = true;
-            toBeSpawned++;
+        if (this.yearlyDue > 0)
+        { // pretty unlikely to be <= 0, but it could happen
+            int period = MONTHS_IN_YEAR / this.yearlyDue;
+            for (int i = 0; i < MONTHS_IN_YEAR && toBeSpawned < this.yearlyDue; i += period)
+            {
+                willSpawn[i] = true;
+                toBeSpawned++;
+            }
         }
+
     }
 
     public void ageUp()

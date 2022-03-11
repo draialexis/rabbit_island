@@ -3,7 +3,7 @@ import java.util.OptionalLong;
 
 public class Main
 {
-    static final  MersenneTwisterFast mt;
+    static final MersenneTwisterFast mt;
 
     static
     {
@@ -33,7 +33,7 @@ public class Main
 
         final int    MALES      = 10;
         final int    FEMALES    = 20;
-        final int    YEARS      = 20;
+        final int    YEARS      = 15;
         final int    REPLICATES = 101; // DO NOT CHANGE & depends on STUDENT_T
         final double STUDENT_T  = 2.6259; // DO NOT CHANGE & depends on REPLICATES
         // for alpha=0.01, at n=101: n-1=100 --> t=2.6259
@@ -41,7 +41,9 @@ public class Main
 
         double mean     = 0;
         double variance = 0;
-        double confRad;
+        double stdDeviation;
+        double stdError;
+        double errorMargin;
         long[] results  = new long[REPLICATES];
         long   result;
 
@@ -52,34 +54,33 @@ public class Main
 
             result = model.run(i + 1, YEARS);
 
-            FileStuff.writeToFile(fileName, Long.toString(result));
+            FileStuff.writeToFile(fileName, result + ",");
             results[i] = result;
             mean += result;
-
-            // TODO calculate variance, mean, confidence interval etc. for final pops
         }
 
         mean /= REPLICATES;
-        OptionalLong max = Arrays.stream(results).max();
-        OptionalLong min = Arrays.stream(results).min();
+
         for (int i = 0; i < REPLICATES; i++)
         {
             variance += Math.pow((results[i] - mean), 2);
         }
-        variance /= (REPLICATES - 1);
 
-        confRad = STUDENT_T * Math.sqrt(variance / REPLICATES); // -1 <= 0-indexed, -1 <= freedom
+        variance /= REPLICATES;
+        stdDeviation = Math.sqrt(variance);
+        stdError = stdDeviation / Math.sqrt(REPLICATES);
+        errorMargin = STUDENT_T * stdError;
 
         final String printout = "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n" +
                                 "after " + REPLICATES + " replicates of a " + YEARS + "-year-long experiment\n" +
                                 "with " + FEMALES + " female and " + MALES + " male starting rabbits\n" +
                                 "observed population levels were such:\n" +
-                                "min = " + min + "\n" +
-                                "max = " + max + "\n" +
                                 "mean = " + mean + "\n" +
                                 "variance = " + variance + "\n" +
-                                "confidence radius = [" + (mean - confRad) + "," + (mean + confRad) + "]\n" +
-                                "with an error margin of " + 0.01;
+                                "standard deviation = " + stdDeviation + "\n" +
+                                "standard error = " + stdError + "\n" +
+                                "margin of error = " + errorMargin + "\n" +
+                                "99% confidence interval = [" + (mean - errorMargin) + "," + (mean + errorMargin) + "]";
 
         FileStuff.writeToFile(fileName, printout);
 
