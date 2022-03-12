@@ -12,7 +12,8 @@ This program uses [`MersenneTwisterFast`](https://javadoc.scijava.org/SciJava/or
 
 The default values for the aforementioned factors may be perused in the `Rabbit` class -- or [here](https://github.com/draialexis/sims_tp4/files/8238541/Lab.4.-.Rabbit.Population.growth.pdf), along with the instructions (in French).
 
-<em><strong>Needs further optimization</strong>, please be aware that running 50 replicates of an 80-month experiment took 15 minutes on a 3.6GHz CPU / 16Gb RAM machine.</em>
+##Warning
+_**Needs further optimization**, please be aware that running 50 replicates of an 80-month experiment took 15 minutes on a 3.6GHz CPU / 16Gb RAM machine._
 
 ## Compilation and execution
 
