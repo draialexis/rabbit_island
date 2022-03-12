@@ -14,9 +14,9 @@ public class RabbitModel
     public RabbitModel(int numFem, int numMal)
     {
         char sex;
+        this.rabbits = new LinkedList<>();
         this.toRemove = new LinkedList<>();
         this.toAdd = new LinkedList<>();
-        this.rabbits = new LinkedList<>();
         this.births = 0;
         this.deaths = 0;
         for (int i = 0; i < numFem + numMal; i++)
@@ -80,8 +80,8 @@ public class RabbitModel
                         !(rabbit.isDead())
                         && rabbit.getSex() == 'f'
                         && rabbit.isFertile()
-                        && rabbit.getWillSpawn()[rabbit.getAgeInMonths() % 12]
-                    // accessing willSpawn, an individualized 12-month birth planner, to check for due births
+                        && rabbit.getWillGiveBirth()[rabbit.getAgeInMonths() % 12]
+                    // accessing willGiveBirth, an individualized 12-month birth planner, to check for due births
                 )
                 {
                     if (Main.mt.nextBoolean(Rabbit.DEATH_IN_LABOR_RATE)) // death during labor also kills the offspring
@@ -91,10 +91,12 @@ public class RabbitModel
                     }
                     else
                     {
-                        int n = (int) Math.round(Main.mt.nextGaussian()
-                                                 * Rabbit.STD_DEVIATION_KITS_PER_LITTER
-                                                 + Rabbit.MEAN_KITS_PER_LITTER); // explicitly casting long into an int
-                        for (int k = 0; k < n; k++)
+                        double rdm = Math.round(Main.mt.nextGaussian()
+                                                * Rabbit.STD_DEVIATION_KITS_PER_LITTER
+                                                + Rabbit.MEAN_KITS_PER_LITTER);
+                        int kits = (int) rdm; // explicitly casting long into an int
+                        // System.out.print(kits + ", "); // looking for [2;6] normal with mean 4 sigma 0.666
+                        for (int k = 0; k < kits; k++)
                         {
                             this.toAdd.add(makeRabbit('r')); // random sex
                         }

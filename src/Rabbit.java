@@ -4,9 +4,9 @@ public class Rabbit
     static final double STD_DEVIATION_KITS_PER_LITTER = 2 / 3.0;          // 0.6_
     static final double DEATH_IN_LABOR_RATE           = 0.15;             // 0.15
 
-    private static final int      MAX_AGE_MONTHS                 = 156;      // 156
+    private static final int      MAX_AGE_MONTHS                 = 156;      // 156 -- 12 years
     private static final int      EARLIEST_FERTILITY_START       = 5;        // 5
-    private static final int      INTERVAL_FERTILITY_START       = 3;        // 3
+    private static final int      INTERVAL_SIZE_FERTILITY        = 3;        // 3
     private static final double   FEMALE_FERTILITY_PROB          = 0.9;      // 0.9
     private static final int      MEAN_LITTERS_PER_YEAR          = 6;        // 6
     private static final double   STD_DEVIATION_LITTERS_PER_YEAR = 1.0;      // 1.0
@@ -46,7 +46,7 @@ public class Rabbit
 
     private final int       fertilityStart;
     private final boolean   canBeFertile;
-    private final boolean[] willSpawn;
+    private final boolean[] willGiveBirth;
     private final char      sex;
 
     private boolean isFertile;
@@ -63,9 +63,9 @@ public class Rabbit
 
     Rabbit(char sex)
     {
-        this.fertilityStart = Main.mt.nextInt(INTERVAL_FERTILITY_START + 1) + EARLIEST_FERTILITY_START;
+        this.fertilityStart = Main.mt.nextInt(INTERVAL_SIZE_FERTILITY + 1) + EARLIEST_FERTILITY_START;
         this.canBeFertile = sex != 'f' || Main.mt.nextBoolean(FEMALE_FERTILITY_PROB);
-        this.willSpawn = new boolean[]{
+        this.willGiveBirth = new boolean[]{
                 false,
                 false,
                 false,
@@ -102,9 +102,9 @@ public class Rabbit
         return this.sex;
     }
 
-    boolean[] getWillSpawn()
+    boolean[] getWillGiveBirth()
     {
-        return willSpawn;
+        return willGiveBirth;
     }
 
     int getAgeInMonths()
@@ -150,8 +150,11 @@ public class Rabbit
 
     private void updateYearlyDue()
     {
-        double rdm = (Main.mt.nextGaussian() * STD_DEVIATION_LITTERS_PER_YEAR + MEAN_LITTERS_PER_YEAR);
-        this.yearlyDue = (int) Math.round(rdm);
+        double rdm = Math.round(Main.mt.nextGaussian()
+                                * STD_DEVIATION_LITTERS_PER_YEAR
+                                + MEAN_LITTERS_PER_YEAR);
+        this.yearlyDue = (int) rdm; // explicitly casting long into an int
+        // System.out.print(this.yearlyDue + ", "); // looking for [3; 9] normal with mean 6 sigma 1
 
         int toBeSpawned = 0;
         if (this.yearlyDue > 0)
@@ -159,7 +162,7 @@ public class Rabbit
             int period = 12 / this.yearlyDue;
             for (int i = 0; i < 12 && toBeSpawned < this.yearlyDue; i += period)
             {
-                willSpawn[i] = true;
+                willGiveBirth[i] = true;
                 toBeSpawned++;
             }
         }

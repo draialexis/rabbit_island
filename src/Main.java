@@ -1,5 +1,5 @@
-import java.util.Arrays;
-import java.util.OptionalLong;
+import java.time.Duration;
+import java.time.Instant;
 
 public class Main
 {
@@ -34,7 +34,7 @@ public class Main
 
         final int MALES   = 5;
         final int FEMALES = 10;
-        final int MONTHS   = 120; // gets prettttty slow past 75, with all default values
+        final int MONTHS  = 80; // gets prettttty slow past 75, with all default values
 
         double mean     = 0;
         double variance = 0;
@@ -45,16 +45,18 @@ public class Main
         long   result;
 
         FileStuff.createFile(fileName);
+        Instant     inst1 = Instant.now();
         for (i = 0; i < REPLICATES; i++)
         {
             RabbitModel model = new RabbitModel(FEMALES, MALES);
-
             result = model.run(MONTHS);
 
             FileStuff.writeToFile(fileName, result + ",");
             results[i] = result;
             mean += result;
         }
+        Instant inst2 = Instant.now();
+        System.out.println("Elapsed Time: " + Duration.between(inst1, inst2).toMinutes() + " minutes");
 
         mean /= REPLICATES;
 
@@ -69,7 +71,8 @@ public class Main
         errorMargin = STUDENT_T * stdError;
 
         final String printout = "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n" +
-                                "after " + REPLICATES + " replicates of a " + MONTHS + "-year-long experiment\n" +
+                                "after " + REPLICATES + " replicates of a " + (MONTHS / 12.0) +
+                                "-year-long experiment\n" +
                                 "with " + FEMALES + " female and " + MALES + " male starting rabbits\n" +
                                 "observed population levels were such:\n" +
                                 "mean = " + mean + "\n" +

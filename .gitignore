@@ -3,3 +3,5 @@
 /build/
 .idea/
 sims_tp4.iml
+*.txt
+*.csv
