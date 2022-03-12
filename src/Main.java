@@ -14,30 +14,27 @@ public class Main
     public static void main(String[] args)
     {
 
-        System.out.println("///// 1) Simple rabbit pop sim /////");
+        System.out.println("================= 1) Simple rabbit pop sim =================");
 
-        long pop;
-        for (int i = 1; i <= 240; i++)
+        long pop = 0;
+        int  i   = 0;
+        while (pop < 8_000_000_000L)
         {
-            pop = SimpleRabbitSim.popByMonth(i);
-            if (pop > 8_000_000_000L)
-            {
-                System.out.println("\nOk, that's enough rabbits\n");
-                break;
-            }
+            pop = SimpleRabbitSim.popByMonth(++i);
         }
+        System.out.println("\nOk, that's enough rabbits\n");
 
-        System.out.println("///// 2) Dank ill rabbit pop sim /////");
+        System.out.println("================= 2) Dank ill rabbit pop sim =================");
+
+        final int    REPLICATES = 50; // DO NOT CHANGE, depends on STUDENT_T
+        final double STUDENT_T  = 2.68; // DO NOT CHANGE, depends on REPLICATES
+        // https://www.supagro.fr/cnam-lr/statnet/tables.htm
 
         final String fileName = "rabbit_pop_results.txt";
 
-        final int    MALES      = 10;
-        final int    FEMALES    = 20;
-        final int    YEARS      = 15;
-        final int    REPLICATES = 101; // DO NOT CHANGE & depends on STUDENT_T
-        final double STUDENT_T  = 2.6259; // DO NOT CHANGE & depends on REPLICATES
-        // for alpha=0.01, at n=101: n-1=100 --> t=2.6259
-        // https://www.supagro.fr/cnam-lr/statnet/tables.htm
+        final int MALES   = 5;
+        final int FEMALES = 10;
+        final int MONTHS   = 120; // gets prettttty slow past 75, with all default values
 
         double mean     = 0;
         double variance = 0;
@@ -48,11 +45,11 @@ public class Main
         long   result;
 
         FileStuff.createFile(fileName);
-        for (int i = 0; i < REPLICATES; i++)
+        for (i = 0; i < REPLICATES; i++)
         {
             RabbitModel model = new RabbitModel(FEMALES, MALES);
 
-            result = model.run(i + 1, YEARS);
+            result = model.run(MONTHS);
 
             FileStuff.writeToFile(fileName, result + ",");
             results[i] = result;
@@ -61,18 +58,18 @@ public class Main
 
         mean /= REPLICATES;
 
-        for (int i = 0; i < REPLICATES; i++)
+        for (i = 0; i < REPLICATES; i++)
         {
             variance += Math.pow((results[i] - mean), 2);
         }
 
-        variance /= REPLICATES;
+        variance /= REPLICATES - 1;
         stdDeviation = Math.sqrt(variance);
         stdError = stdDeviation / Math.sqrt(REPLICATES);
         errorMargin = STUDENT_T * stdError;
 
         final String printout = "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n" +
-                                "after " + REPLICATES + " replicates of a " + YEARS + "-year-long experiment\n" +
+                                "after " + REPLICATES + " replicates of a " + MONTHS + "-year-long experiment\n" +
                                 "with " + FEMALES + " female and " + MALES + " male starting rabbits\n" +
                                 "observed population levels were such:\n" +
                                 "mean = " + mean + "\n" +

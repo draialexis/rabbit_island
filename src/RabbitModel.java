@@ -1,8 +1,9 @@
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class RabbitModel
 {
+    // private static int replNum = 1;
+
     private final LinkedList<Rabbit> rabbits;
     private final LinkedList<Rabbit> toRemove;
     private final LinkedList<Rabbit> toAdd;
@@ -35,15 +36,15 @@ public class RabbitModel
     private Rabbit makeRabbit(char sex)
     {
         this.births++;
-        if (sex == 'f' || sex == 'm') // male or female
+        if (sex == 'r') // random
         {
-            return new Rabbit(sex);
+            return new Rabbit();
         }
         else
         {
-            if (sex == 'r') // random
+            if (sex == 'f' || sex == 'm') // male or female
             {
-                return new Rabbit();
+                return new Rabbit(sex);
             }
             else
             {
@@ -58,16 +59,12 @@ public class RabbitModel
         rabbit.kill();
     }
 
-    long run(int i, int years)
+    long run(int months)
     {
-        int    duration = Rabbit.MONTHS_IN_YEAR * years;// TODO remove before shipping
-        String fileName = "rabbits" + duration + "m_i" + i + ".csv";// TODO remove before shipping
-
-        FileStuff.createFile(fileName);// TODO remove before shipping
-        FileStuff.writeToFile(fileName, "births;deaths");// TODO remove before shipping
-
-        //        for (int j = 1; j <= Rabbit.MONTHS_IN_YEAR * years; j++)
-        for (int j = 1; j <= duration; j++)
+        //        String fileName = "rabbits" + months + "m_i" + replNum++ + ".csv";// TODO remove before shipping
+        //        FileStuff.createFile(fileName);// TODO remove before shipping
+        //        FileStuff.writeToFile(fileName, "births;deaths");// TODO remove before shipping
+        for (int j = 1; j <= months; j++)
         {
             for (Rabbit rabbit : this.rabbits)
             {
@@ -78,27 +75,28 @@ public class RabbitModel
                     this.toRemove.add(rabbit);
                 }
                 // then checking for births
-                if (!(rabbit.isDead()) && rabbit.getSex() == 'f' && rabbit.isFertile())
+                if
+                (
+                        !(rabbit.isDead())
+                        && rabbit.getSex() == 'f'
+                        && rabbit.isFertile()
+                        && rabbit.getWillSpawn()[rabbit.getAgeInMonths() % 12]
+                    // accessing willSpawn, an individualized 12-month birth planner, to check for due births
+                )
                 {
-                    boolean[] willSpawn       = rabbit.getWillSpawn();
-                    int       ageWithoutYears = rabbit.getAgeMonths() % Rabbit.MONTHS_IN_YEAR;
-                    if (willSpawn[ageWithoutYears])
+                    if (Main.mt.nextBoolean(Rabbit.DEATH_IN_LABOR_RATE)) // death during labor also kills the offspring
                     {
-                        if (Main.mt.nextBoolean(Rabbit.DEATH_IN_LABOR_RATE)) // death during labor also kills the offspring
+                        unmakeRabbit(rabbit);
+                        this.toRemove.add(rabbit);
+                    }
+                    else
+                    {
+                        int n = (int) Math.round(Main.mt.nextGaussian()
+                                                 * Rabbit.STD_DEVIATION_KITS_PER_LITTER
+                                                 + Rabbit.MEAN_KITS_PER_LITTER); // explicitly casting long into an int
+                        for (int k = 0; k < n; k++)
                         {
-                            unmakeRabbit(rabbit);
-                            this.toRemove.add(rabbit);
-                        }
-                        else
-                        {
-                            double rdm = Main.mt.nextGaussian()
-                                         * Rabbit.STD_DEVIATION_LITTERS_PER_YEAR
-                                         + Rabbit.MEAN_LITTERS_PER_YEAR;
-                            int n = (int) Math.round(rdm); // explicitly casting long into an int
-                            for (int k = 0; k < n; k++)
-                            {
-                                this.toAdd.add(makeRabbit('r')); // random sex
-                            }
+                            this.toAdd.add(makeRabbit('r')); // random sex
                         }
                     }
                 }
@@ -110,7 +108,7 @@ public class RabbitModel
             this.rabbits.addAll(this.toAdd);
             this.toAdd.clear();
 
-            FileStuff.writeToFile(fileName, this.births + ";" + this.deaths);// TODO remove before shipping
+            //            FileStuff.writeToFile(fileName, this.births + ";" + this.deaths);// TODO remove before shipping
         }
         return this.births - this.deaths;
         // TODO show graphs

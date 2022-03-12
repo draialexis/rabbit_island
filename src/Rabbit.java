@@ -1,19 +1,19 @@
 public class Rabbit
 {
-    static final int    MONTHS_IN_YEAR                 = 12;
-    static final int    MEAN_LITTERS_PER_YEAR          = 6;
-    static final double STD_DEVIATION_LITTERS_PER_YEAR = 1.0;
-    static final double DEATH_IN_LABOR_RATE            = 0.15;
+    static final int    MEAN_KITS_PER_LITTER          = 4;                // 4
+    static final double STD_DEVIATION_KITS_PER_LITTER = 2 / 3.0;          // 0.6_
+    static final double DEATH_IN_LABOR_RATE           = 0.15;             // 0.15
 
-    private static final int      MAX_AGE_MONTHS                = 156;
-    private static final int      EARLIEST_FERTILITY_START      = 5;
-    private static final int      INTERVAL_FERTILITY_START      = 3;
-    private static final double   FEMALE_FERTILITY_PROB         = 0.9;
-    private static final int      MEAN_KITS_PER_LITTER          = 4;
-    private static final double   STD_DEVIATION_KITS_PER_LITTER = 2 / 3.0;
-    private static final double[] MONTHLY_MORTALITIES           = new double[MAX_AGE_MONTHS - MONTHS_IN_YEAR];
+    private static final int      MAX_AGE_MONTHS                 = 156;      // 156
+    private static final int      EARLIEST_FERTILITY_START       = 5;        // 5
+    private static final int      INTERVAL_FERTILITY_START       = 3;        // 3
+    private static final double   FEMALE_FERTILITY_PROB          = 0.9;      // 0.9
+    private static final int      MEAN_LITTERS_PER_YEAR          = 6;        // 6
+    private static final double   STD_DEVIATION_LITTERS_PER_YEAR = 1.0;      // 1.0
+    private static final double   KIT_MORTALITY                  = Math.pow((1 + 0.75), (1 / 12.0)) - 1;
+    private static final double[] MONTHLY_MORTALITIES            = new double[MAX_AGE_MONTHS - 12];
     // ignoring year 0->1
-    private static final double[] YEARLY_MORTALITIES            = {
+    private static final double[] YEARLY_MORTALITIES             = {
             // [0;1[ (will be ignored in static m_m calculations)
             0.25,    // [1;2[
             0.25,    // [2;3[
@@ -35,7 +35,7 @@ public class Rabbit
         int k = 0;
         for (double yearlyMortality : YEARLY_MORTALITIES)
         {
-            for (int i = 0; i < MONTHS_IN_YEAR; i++)
+            for (int i = 0; i < 12; i++)
             {
                 double m = (Math.pow((1 + yearlyMortality), (1 / 12.0)) - 1);
                 MONTHLY_MORTALITIES[k] = m;
@@ -52,7 +52,7 @@ public class Rabbit
     private boolean isFertile;
     private boolean isMature;
     private boolean isDead;
-    private int     ageMonths;
+    private int     ageInMonths;
     private int     yearlyDue;
     // the rabbit's year, not the model's -- also, not based on birthday of rabbit, but maturation anniversary
 
@@ -65,13 +65,25 @@ public class Rabbit
     {
         this.fertilityStart = Main.mt.nextInt(INTERVAL_FERTILITY_START + 1) + EARLIEST_FERTILITY_START;
         this.canBeFertile = sex != 'f' || Main.mt.nextBoolean(FEMALE_FERTILITY_PROB);
-        this.willSpawn = new boolean[MONTHS_IN_YEAR];
+        this.willSpawn = new boolean[]{
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false
+        };
         this.sex = sex;
-
         this.isFertile = false;
         this.isMature = false;
         this.isDead = false;
-        this.ageMonths = 0;
+        this.ageInMonths = 0;
         this.yearlyDue = 0;
     }
 
@@ -95,9 +107,9 @@ public class Rabbit
         return willSpawn;
     }
 
-    int getAgeMonths()
+    int getAgeInMonths()
     {
-        return ageMonths;
+        return ageInMonths;
     }
 
     public void kill()
@@ -107,26 +119,28 @@ public class Rabbit
 
     private void updateDead()
     {
-        double rdm = Main.mt.nextDouble(true, true);
+        double rdm = Main.mt.nextDouble();
         if
         (
             // death from old age
-                (this.ageMonths == MAX_AGE_MONTHS)
+                (this.ageInMonths == MAX_AGE_MONTHS)
                 ||
                 (
                         // death before 1 year: monthly mortality rate depends on maturity, which depends on individual
-                        (this.ageMonths < MONTHS_IN_YEAR)
+                        (this.ageInMonths < 12)
                         &&
-                        ((this.isMature && (rdm < Math.pow((1 + 0.5), (1 / 12.0)) - 1))
-                         || (rdm < Math.pow((1 + 0.75), (1 / 12.0)) - 1)
+                        (
+                                (this.isMature && (rdm < MONTHLY_MORTALITIES[0])) // same rate as for 1-year-olds
+                                ||
+                                (rdm < KIT_MORTALITY)
                         )
                 )
                 ||
                 (
                         // death from other monthly mortality rates which were calculated at compile-time
-                        (this.ageMonths >= MONTHS_IN_YEAR)
+                        (this.ageInMonths >= 12)
                         &&
-                        (rdm < MONTHLY_MORTALITIES[this.ageMonths - MONTHS_IN_YEAR])
+                        (rdm < MONTHLY_MORTALITIES[this.ageInMonths - 12])
                 )
         )
         {
@@ -136,27 +150,26 @@ public class Rabbit
 
     private void updateYearlyDue()
     {
-        double rdm = (Main.mt.nextGaussian() * STD_DEVIATION_KITS_PER_LITTER + MEAN_KITS_PER_LITTER);
+        double rdm = (Main.mt.nextGaussian() * STD_DEVIATION_LITTERS_PER_YEAR + MEAN_LITTERS_PER_YEAR);
         this.yearlyDue = (int) Math.round(rdm);
 
         int toBeSpawned = 0;
         if (this.yearlyDue > 0)
-        { // pretty unlikely to be <= 0, but it could happen
-            int period = MONTHS_IN_YEAR / this.yearlyDue;
-            for (int i = 0; i < MONTHS_IN_YEAR && toBeSpawned < this.yearlyDue; i += period)
+        { // pretty unlikely to be <= 0 with default values, but it could happen
+            int period = 12 / this.yearlyDue;
+            for (int i = 0; i < 12 && toBeSpawned < this.yearlyDue; i += period)
             {
                 willSpawn[i] = true;
                 toBeSpawned++;
             }
         }
-
     }
 
     public void ageUp()
     {
-        this.ageMonths++;
+        this.ageInMonths++;
 
-        if (!(this.isMature) && (this.ageMonths == this.fertilityStart))
+        if (!(this.isMature) && (this.ageInMonths == this.fertilityStart))
         {
             this.isMature = true;
         }
@@ -172,7 +185,7 @@ public class Rabbit
         (
                 (this.sex == 'f')
                 && this.isFertile
-                && ((this.ageMonths - this.fertilityStart) % MONTHS_IN_YEAR == 0)
+                && ((this.ageInMonths - this.fertilityStart) % 12 == 0)
         )
         {
             this.updateYearlyDue();
