@@ -14,7 +14,7 @@ public class Main
     public static void main(String[] args)
     {
 
-        System.out.println("================= 1) Simple rabbit pop sim =================");
+        System.out.println("================= 1) Simple rabbit pop sim (fibo) =================");
 
         long pop = 0;
         int  i   = 0;
@@ -24,7 +24,7 @@ public class Main
         }
         System.out.println("\nOk, that's enough rabbits\n");
 
-        System.out.println("================= 2) Dank ill rabbit pop sim =================");
+        System.out.println("================= 2) Dank ill rabbit pop sim (actual sim) =================");
 
         final int    REPLICATES = 50; // DO NOT CHANGE, depends on STUDENT_T
         final double STUDENT_T  = 2.68; // DO NOT CHANGE, depends on REPLICATES
@@ -34,7 +34,7 @@ public class Main
 
         final int MALES   = 5;
         final int FEMALES = 10;
-        final int MONTHS  = 80; // gets prettttty slow past 75, with all default values
+        final int MONTHS  = 120; // gets prettttty slow past 75, with all default values
 
         double mean     = 0;
         double variance = 0;
