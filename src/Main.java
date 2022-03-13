@@ -28,13 +28,13 @@ public class Main
 
         final int    REPLICATES = 50; // DO NOT CHANGE, depends on STUDENT_T
         final double STUDENT_T  = 2.68; // DO NOT CHANGE, depends on REPLICATES
-        // https://www.supagro.fr/cnam-lr/statnet/tables.htm
+        // refer to https://www.supagro.fr/cnam-lr/statnet/tables.htm for co-dependant values
 
         final String fileName = "rabbit_pop_results.txt";
 
         final int MALES   = 5;
         final int FEMALES = 10;
-        final int MONTHS  = 120; // gets prettttty slow past 75, with all default values
+        final int MONTHS  = 80; // gets prettttty slow past 75, with all default values
 
         double mean     = 0;
         double variance = 0;
@@ -45,18 +45,16 @@ public class Main
         long   result;
 
         FileStuff.createFile(fileName);
-        Instant     inst1 = Instant.now();
         for (i = 0; i < REPLICATES; i++)
         {
             RabbitModel model = new RabbitModel(FEMALES, MALES);
+
             result = model.run(MONTHS);
 
             FileStuff.writeToFile(fileName, result + ",");
             results[i] = result;
             mean += result;
         }
-        Instant inst2 = Instant.now();
-        System.out.println("Elapsed Time: " + Duration.between(inst1, inst2).toMinutes() + " minutes");
 
         mean /= REPLICATES;
 

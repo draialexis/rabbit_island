@@ -6,6 +6,7 @@ Simulating rabbit population growth, with replicate experiments, given a few fac
 * maximum age
 * range of possible values for maturity threshold
 * female infertility rate
+* female to male ratio
 * general mortality rates depending on age
 
 This program uses [`MersenneTwisterFast`](https://javadoc.scijava.org/SciJava/org/scijava/util/MersenneTwisterFast.html) for pseudorandom number generation.

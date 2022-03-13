@@ -7,6 +7,7 @@ public class Rabbit
     private static final int      MAX_AGE_MONTHS                 = 156;      // 156 -- 12 years
     private static final int      EARLIEST_FERTILITY_START       = 5;        // 5
     private static final int      INTERVAL_SIZE_FERTILITY        = 3;        // 3
+    private static final double   FEMALE_RATIO                   = 0.5;      // 0.5
     private static final double   FEMALE_FERTILITY_PROB          = 0.9;      // 0.9
     private static final int      MEAN_LITTERS_PER_YEAR          = 6;        // 6
     private static final double   STD_DEVIATION_LITTERS_PER_YEAR = 1.0;      // 1.0
@@ -47,7 +48,7 @@ public class Rabbit
     private final int       fertilityStart;
     private final boolean   canBeFertile;
     private final boolean[] willGiveBirth;
-    private final char      sex;
+    private final boolean   isFemale;
 
     private boolean isFertile;
     private boolean isMature;
@@ -58,13 +59,13 @@ public class Rabbit
 
     Rabbit()
     {
-        this(Main.mt.nextDouble() < 0.5 ? 'f' : 'm');
+        this(Main.mt.nextBoolean(FEMALE_RATIO));
     }
 
-    Rabbit(char sex)
+    Rabbit(boolean isFemale)
     {
         this.fertilityStart = Main.mt.nextInt(INTERVAL_SIZE_FERTILITY + 1) + EARLIEST_FERTILITY_START;
-        this.canBeFertile = sex != 'f' || Main.mt.nextBoolean(FEMALE_FERTILITY_PROB);
+        this.canBeFertile = !isFemale || Main.mt.nextBoolean(FEMALE_FERTILITY_PROB);
         this.willGiveBirth = new boolean[]{
                 false,
                 false,
@@ -79,7 +80,7 @@ public class Rabbit
                 false,
                 false
         };
-        this.sex = sex;
+        this.isFemale = isFemale;
         this.isFertile = false;
         this.isMature = false;
         this.isDead = false;
@@ -97,9 +98,9 @@ public class Rabbit
         return this.isDead;
     }
 
-    public char getSex()
+    public boolean isFemale()
     {
-        return this.sex;
+        return this.isFemale;
     }
 
     boolean[] getWillGiveBirth()
@@ -172,26 +173,25 @@ public class Rabbit
     {
         this.ageInMonths++;
 
-        if (!(this.isMature) && (this.ageInMonths == this.fertilityStart))
+        if ((this.ageInMonths == this.fertilityStart) && !(this.isMature)) // maturation
         {
             this.isMature = true;
+            if (!(this.isFertile) && this.canBeFertile) // fertility
+            {
+                this.isFertile = true;
+            }
         }
 
-        this.updateDead();
-
-        if (!(this.isFertile) && this.isMature && this.canBeFertile)
-        {
-            this.isFertile = true;
-        }
+        this.updateDead(); // checking for age-related deaths
 
         if
         (
-                (this.sex == 'f')
+                ((this.ageInMonths - this.fertilityStart) % 12 == 0) // pregnancies
+                && this.isFemale
                 && this.isFertile
-                && ((this.ageInMonths - this.fertilityStart) % 12 == 0)
         )
         {
-            this.updateYearlyDue();
+            this.updateYearlyDue(); // updating the birth-giving planner
         }
     }
 }
