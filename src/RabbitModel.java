@@ -8,7 +8,6 @@ public class RabbitModel
 
     private final LinkedList<Rabbit> rabbits; // linked lists allow for insertions and removals in constant time
     private final LinkedList<Rabbit> toRemove;
-    private final LinkedList<Rabbit> bloodedCaerBunnies;
     private final LinkedList<Rabbit> toAdd;
 
     private long births; // storing pop figures as separate attributes to avoid having to call the lists size() methods
@@ -19,7 +18,6 @@ public class RabbitModel
     {
         this.rabbits = new LinkedList<>();
         this.toRemove = new LinkedList<>();
-        this.bloodedCaerBunnies = new LinkedList<>();
         this.toAdd = new LinkedList<>();
         this.births = 0;
         this.deaths = 0;
@@ -52,7 +50,7 @@ public class RabbitModel
     {
         String fileName = "rabbits" + months + "m_i" + replNum++ + ".csv";// TODO remove before shipping
         FileStuff.createFile(fileName);// TODO remove before shipping
-        FileStuff.writeToFile(fileName, "births;deaths;pop");// TODO remove before shipping
+        FileStuff.writeToFile(fileName, "births;deaths;pop;predators");// TODO remove before shipping
 
         double ratio    = 0.0, mean = 0.0;
         long   prevTime = 0, crtTime;
@@ -99,17 +97,15 @@ public class RabbitModel
                 }
                 if (rabbit.isRabbitOfCaerbannog())
                 {
-                    if (this.births - this.deaths > PREDATOR_THRESHOLD)
+                    if (this.births - this.deaths >= PREDATOR_THRESHOLD)
                     {
                         // Ok, that's enough rabbits
-                        this.bloodedCaerBunnies.add(rabbit);
                         this.activePredators++;
                     }
                     else
                     {
                         if (this.activePredators > 0)
                         {
-                            this.bloodedCaerBunnies.clear();
                             // all predators go back to alfalfa and carrots if the population shrinks low enough
                             this.activePredators = 0;
                         }
@@ -118,30 +114,36 @@ public class RabbitModel
             }
             // removing inactive cells to avoid stack-overflow and performance issues
             // using auxiliary lists, for pop evolution, to avoid concurrent modification errors at runtime
-            // iterators are cool for removing elements mid-loop, but adding elements gets complicated
+            // iterators are cool for removing elements mid-loop, but adding elements on top gets complicated
             this.rabbits.removeAll(this.toRemove);
             this.toRemove.clear();
             this.rabbits.addAll(this.toAdd);
             this.toAdd.clear();
 
-            int predators = this.bloodedCaerBunnies.size();
+            if (this.births - this.deaths <= Main.MAX_INT)
             {
-                for (int i = 0; i < predators; i++)
+                int kills = 0;
+
+                for (int i = 0; i < this.activePredators; i++)
                 {
-                    double rdm = Math.round(Main.MT.nextGaussian()
-                                            * Rabbit.STD_DEVIATION_KILLS
-                                            + Rabbit.MEAN_KILLS);
-                    int kills = (int) rdm;
-                    // this should be fine, as long as there are less than 2147483647 rabbits
+                    if (this.births - this.deaths >= PREDATOR_THRESHOLD)
+                    {
+                        double rdm = Math.round(Main.MT.nextGaussian()
+                                                * Rabbit.STD_DEVIATION_KILLS
+                                                + Rabbit.MEAN_KILLS);
+                        kills = (int) rdm; // this should be fine, as long as there are less than 2_147_483_647 rabbits
+                    }
+                    else
+                    {
+                        this.activePredators = 0; // we had some... overkill problems
+                    }
                     for (int k = 0; k < kills; k++)
                     {
-                        if (this.births - this.deaths > PREDATOR_THRESHOLD && this.births - this.deaths <= Main.MAX_INT)
                         {
                             int idx = Main.MT.nextInt((int) (this.births - this.deaths) - 1);
                             unmakeRabbit(this.rabbits.get(idx));
                             this.rabbits.remove(idx);
                             // randomly drawing the victims among all pop --
-                            // could technically include themselves or other predators, which is fine
                         }
                     }
                 }
@@ -168,9 +170,8 @@ public class RabbitModel
         mean /= months - 1;
         System.out.println("mean ratio=" + mean);
         /*
-         * ...... at 90 months
-         * ....... at 90 months with decimating predators
-         * ....... at 90 months with double decimating predators
+         * ...... at 156 months
+         * ....... at 156 months with [4k;6k] predators
          */
         return this.births - this.deaths;
         // TODO show graphs
