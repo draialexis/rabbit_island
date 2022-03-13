@@ -32,7 +32,7 @@ public class Main
 
         final int MALES   = 5;
         final int FEMALES = 10;
-        final int MONTHS  = 90; // gets prettttty slow past 75, with all default values
+        final int MONTHS  = 156; // increase at your own risks
 
         double mean     = 0;
         double variance = 0;

@@ -1,22 +1,22 @@
 public class Rabbit
 {
-    static final int    MEAN_KITS_PER_LITTER          = 4;                  // 4
-    static final double STD_DEVIATION_KITS_PER_LITTER = 2 / 3.0;            // 0.6_ (2 / 3.0)
-    static final double DEATH_IN_LABOR_RATE           = 0.15;               // 0.15
-    static final double MEAN_KILLS                    = 5000.0;             // 5000.0 (added on top)
-    static final double STD_DEVIATION_KILLS           = 1000/3.0;           // 333.3_ (1000/3.0) (added on top)
+    static final int    MEAN_KITS_PER_LITTER          = 4;                      // 4
+    static final double STD_DEVIATION_KITS_PER_LITTER = 2 / 3.0;                // 0.6_ (2 / 3.0)
+    static final double DEATH_IN_LABOR_RATE           = 0.15;                   // 0.15
+    static final double MEAN_KILLS                    = 5000.0;                 // 5000.0 (added on top)
+    static final double STD_DEVIATION_KILLS           = 1000 / 3.0;             // 333.3_ (1000/3.0) (added on top)
     // externalized some attributes, trying to sacrifice robustness for speed
 
-    private static final int      MAX_AGE_MONTHS                 = 156;      // 156 -- 13 years (suggested 13 years)
-    private static final int      EARLIEST_FERTILITY_START       = 5;        // 5
-    private static final int      INTERVAL_SIZE_FERTILITY_START  = 3;        // 3
-    private static final int      INTERVAL_SIZE_FERTILITY        = 48;       // 48 -- 4 years (added on top)
-    private static final double   FEMALE_RATIO                   = 0.5;      // 0.5
-    private static final double   FEMALE_FERTILITY_PROB          = 0.9;      // 0.9
-    private final static double   CAERBANNOG_RATIO               = 0.00002;  // 0.00002 (1 in 50_000) (added on top)
-    private static final int      MEAN_LITTERS_PER_YEAR          = 6;        // 6
-    private static final double   STD_DEVIATION_LITTERS_PER_YEAR = 1.0;      // 1.0
-    private static final double   KIT_YEARLY_MORTALITY           = 0.75;     // 0.75
+    private static final int      MAX_AGE_MONTHS                 = 120;         // 120 -- 10 years (suggested 13 years)
+    private static final int      EARLIEST_FERTILITY_START       = 5;           // 5
+    private static final int      INTERVAL_SIZE_FERTILITY_START  = 3;           // 3
+    private static final int      INTERVAL_SIZE_FERTILITY        = 48;          // 48 -- 4 years (added on top)
+    private static final double   FEMALE_RATIO                   = 0.5;         // 0.5
+    private static final double   FEMALE_FERTILITY_PROB          = 0.9;         // 0.9
+    private final static double   CAERBANNOG_RATIO               = 1 / 32768.0; // 0.00003 (1 in 2^15) (added on top)
+    private static final int      MEAN_LITTERS_PER_YEAR          = 6;           // 6
+    private static final double   STD_DEVIATION_LITTERS_PER_YEAR = 1.0;         // 1.0
+    private static final double   KIT_YEARLY_MORTALITY           = 0.75;        // 0.75
     private static final double   KIT_MONTHLY_MORTALITY          = Math.pow((1 + KIT_YEARLY_MORTALITY), (1 / 12.0)) - 1;
     private static final double[] YEARLY_MORTALITIES             = {
             // [0;1[ (will be ignored in static monthly mortality rate calculations)
@@ -24,14 +24,14 @@ public class Rabbit
             0.25,    // [2;3[
             0.25,    // [3;4[
             0.25,    // [4;5[
-            0.25,    // [5;6[
-            0.25,    // [6;7[
-            0.25,    // [7;8[
-            0.4,     // [8;9[
-            0.55,    // [9;10[
-            0.7,     // [10;11[
-            0.85,    // [11;12[
-            1.0      // [12;13[
+            //            0.25,    // [5;6[
+            //            0.25,    // [6;7[
+            //            0.25,    // [7;8[
+            0.4,     // [5;6[   // [8;9[
+            0.55,    // [6;7[   // [9;10[
+            0.7,     // [7;8[   // [10;11[
+            0.85,    // [8;9[   // [11;12[
+            1.0      // [9;10[  // [12;13[
     };
 
     private static final double[] MONTHLY_MORTALITIES = new double[MAX_AGE_MONTHS - 12];
