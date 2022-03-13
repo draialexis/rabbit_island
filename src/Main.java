@@ -1,14 +1,12 @@
-import java.time.Duration;
-import java.time.Instant;
-
 public class Main
 {
-    static final MersenneTwisterFast mt;
+    static final MersenneTwisterFast MT;
+    static final int                 MAX_INT = 2147483647;
 
     static
     {
         // initializing the Mersenne Twister
-        mt = new MersenneTwisterFast(new int[]{0x123, 0x234, 0x345, 0x456});
+        MT = new MersenneTwisterFast(new int[]{0x123, 0x234, 0x345, 0x456});
     }
 
     public static void main(String[] args)
@@ -34,7 +32,7 @@ public class Main
 
         final int MALES   = 5;
         final int FEMALES = 10;
-        final int MONTHS  = 80; // gets prettttty slow past 75, with all default values
+        final int MONTHS  = 90; // gets prettttty slow past 75, with all default values
 
         double mean     = 0;
         double variance = 0;

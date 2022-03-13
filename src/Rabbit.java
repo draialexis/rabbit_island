@@ -1,21 +1,25 @@
 public class Rabbit
 {
-    static final int    MEAN_KITS_PER_LITTER          = 4;                // 4
-    static final double STD_DEVIATION_KITS_PER_LITTER = 2 / 3.0;          // 0.6_
-    static final double DEATH_IN_LABOR_RATE           = 0.15;             // 0.15
+    static final int    MEAN_KITS_PER_LITTER          = 4;                  // 4
+    static final double STD_DEVIATION_KITS_PER_LITTER = 2 / 3.0;            // 0.6_ (2 / 3.0)
+    static final double DEATH_IN_LABOR_RATE           = 0.15;               // 0.15
+    static final double MEAN_KILLS                    = 5000.0;             // 5000.0 (added on top)
+    static final double STD_DEVIATION_KILLS           = 1000/3.0;           // 333.3_ (1000/3.0) (added on top)
+    // externalized some attributes, trying to sacrifice robustness for speed
 
-    private static final int      MAX_AGE_MONTHS                 = 156;      // 156 -- 12 years
+    private static final int      MAX_AGE_MONTHS                 = 156;      // 156 -- 13 years (suggested 13 years)
     private static final int      EARLIEST_FERTILITY_START       = 5;        // 5
-    private static final int      INTERVAL_SIZE_FERTILITY        = 3;        // 3
+    private static final int      INTERVAL_SIZE_FERTILITY_START  = 3;        // 3
+    private static final int      INTERVAL_SIZE_FERTILITY        = 48;       // 48 -- 4 years (added on top)
     private static final double   FEMALE_RATIO                   = 0.5;      // 0.5
     private static final double   FEMALE_FERTILITY_PROB          = 0.9;      // 0.9
+    private final static double   CAERBANNOG_RATIO               = 0.00002;  // 0.00002 (1 in 50_000) (added on top)
     private static final int      MEAN_LITTERS_PER_YEAR          = 6;        // 6
     private static final double   STD_DEVIATION_LITTERS_PER_YEAR = 1.0;      // 1.0
-    private static final double   KIT_MORTALITY                  = Math.pow((1 + 0.75), (1 / 12.0)) - 1;
-    private static final double[] MONTHLY_MORTALITIES            = new double[MAX_AGE_MONTHS - 12];
-    // ignoring year 0->1
+    private static final double   KIT_YEARLY_MORTALITY           = 0.75;     // 0.75
+    private static final double   KIT_MONTHLY_MORTALITY          = Math.pow((1 + KIT_YEARLY_MORTALITY), (1 / 12.0)) - 1;
     private static final double[] YEARLY_MORTALITIES             = {
-            // [0;1[ (will be ignored in static m_m calculations)
+            // [0;1[ (will be ignored in static monthly mortality rate calculations)
             0.25,    // [1;2[
             0.25,    // [2;3[
             0.25,    // [3;4[
@@ -29,6 +33,9 @@ public class Rabbit
             0.85,    // [11;12[
             1.0      // [12;13[
     };
+
+    private static final double[] MONTHLY_MORTALITIES = new double[MAX_AGE_MONTHS - 12];
+    // ignoring year 0->1
 
     static
     {
@@ -49,6 +56,7 @@ public class Rabbit
     private final boolean   canBeFertile;
     private final boolean[] willGiveBirth;
     private final boolean   isFemale;
+    private final boolean   isRabbitOfCaerbannog;
 
     private boolean isFertile;
     private boolean isMature;
@@ -59,13 +67,13 @@ public class Rabbit
 
     Rabbit()
     {
-        this(Main.mt.nextBoolean(FEMALE_RATIO));
+        this(Main.MT.nextBoolean(FEMALE_RATIO));
     }
 
     Rabbit(boolean isFemale)
     {
-        this.fertilityStart = Main.mt.nextInt(INTERVAL_SIZE_FERTILITY + 1) + EARLIEST_FERTILITY_START;
-        this.canBeFertile = !isFemale || Main.mt.nextBoolean(FEMALE_FERTILITY_PROB);
+        this.fertilityStart = Main.MT.nextInt(INTERVAL_SIZE_FERTILITY_START + 1) + EARLIEST_FERTILITY_START;
+        this.canBeFertile = !isFemale || Main.MT.nextBoolean(FEMALE_FERTILITY_PROB);
         this.willGiveBirth = new boolean[]{
                 false,
                 false,
@@ -80,12 +88,23 @@ public class Rabbit
                 false,
                 false
         };
+        this.isRabbitOfCaerbannog = Main.MT.nextBoolean(CAERBANNOG_RATIO);
         this.isFemale = isFemale;
         this.isFertile = false;
         this.isMature = false;
         this.isDead = false;
         this.ageInMonths = 0;
         this.yearlyDue = 0;
+    }
+
+    boolean isRabbitOfCaerbannog()
+    {
+        return isRabbitOfCaerbannog;
+    }
+
+    public boolean isFemale()
+    {
+        return this.isFemale;
     }
 
     public boolean isFertile()
@@ -96,11 +115,6 @@ public class Rabbit
     public boolean isDead()
     {
         return this.isDead;
-    }
-
-    public boolean isFemale()
-    {
-        return this.isFemale;
     }
 
     boolean[] getWillGiveBirth()
@@ -120,12 +134,10 @@ public class Rabbit
 
     private void updateDead()
     {
-        double rdm = Main.mt.nextDouble();
+        double rdm = Main.MT.nextDouble();
+        //putting the likeliest candidates for death first, to get out of the OR conditional structure faster
         if
         (
-            // death from old age
-                (this.ageInMonths == MAX_AGE_MONTHS)
-                ||
                 (
                         // death before 1 year: monthly mortality rate depends on maturity, which depends on individual
                         (this.ageInMonths < 12)
@@ -133,16 +145,19 @@ public class Rabbit
                         (
                                 (this.isMature && (rdm < MONTHLY_MORTALITIES[0])) // same rate as for 1-year-olds
                                 ||
-                                (rdm < KIT_MORTALITY)
+                                (rdm < KIT_MONTHLY_MORTALITY)
                         )
                 )
                 ||
                 (
                         // death from other monthly mortality rates which were calculated at compile-time
-                        (this.ageInMonths >= 12)
+                        (12 <= this.ageInMonths && this.ageInMonths < MAX_AGE_MONTHS)
                         &&
                         (rdm < MONTHLY_MORTALITIES[this.ageInMonths - 12])
                 )
+                ||
+                // death from old age
+                (this.ageInMonths == MAX_AGE_MONTHS)
         )
         {
             this.isDead = true;
@@ -151,11 +166,11 @@ public class Rabbit
 
     private void updateYearlyDue()
     {
-        double rdm = Math.round(Main.mt.nextGaussian()
+        this.resetWillGiveBirth();
+        double rdm = Math.round(Main.MT.nextGaussian()
                                 * STD_DEVIATION_LITTERS_PER_YEAR
                                 + MEAN_LITTERS_PER_YEAR);
         this.yearlyDue = (int) rdm; // explicitly casting long into an int
-        // System.out.print(this.yearlyDue + ", "); // looking for [3; 9] normal with mean 6 sigma 1
 
         int toBeSpawned = 0;
         if (this.yearlyDue > 0)
@@ -163,9 +178,17 @@ public class Rabbit
             int period = 12 / this.yearlyDue;
             for (int i = 0; i < 12 && toBeSpawned < this.yearlyDue; i += period)
             {
-                willGiveBirth[i] = true;
+                this.willGiveBirth[i] = true;
                 toBeSpawned++;
             }
+        }
+    }
+
+    private void resetWillGiveBirth()
+    {
+        for (int i = 0; i < 12; i++)
+        {
+            this.willGiveBirth[i] = false;
         }
     }
 
@@ -173,6 +196,7 @@ public class Rabbit
     {
         this.ageInMonths++;
 
+        //putting the least likely condition first, to get out of the AND conditional structure faster
         if ((this.ageInMonths == this.fertilityStart) && !(this.isMature)) // maturation
         {
             this.isMature = true;
@@ -184,14 +208,22 @@ public class Rabbit
 
         this.updateDead(); // checking for age-related deaths
 
+        //putting the least likely condition first, to get out of the AND conditional structure faster
+        int fertility_career = this.ageInMonths - this.fertilityStart;
         if
         (
-                ((this.ageInMonths - this.fertilityStart) % 12 == 0) // pregnancies
+                fertility_career % 12 == 0 // pregnancies
+                && fertility_career < INTERVAL_SIZE_FERTILITY
                 && this.isFemale
                 && this.isFertile
         )
         {
-            this.updateYearlyDue(); // updating the birth-giving planner
+            this.updateYearlyDue();
+        }
+        if (fertility_career == INTERVAL_SIZE_FERTILITY && this.isFemale)
+        {
+            this.resetWillGiveBirth();
+            this.isFertile = false;
         }
     }
 }
