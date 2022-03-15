@@ -46,6 +46,11 @@ public class RabbitModel
         rabbit.kill();
     }
 
+    private long getPop()
+    {
+        return this.births - this.deaths;
+    }
+
     long run(int months)
     {
         String fileName = "rabbits" + months + "m_i" + replNum++ + ".csv";// TODO remove before shipping
@@ -140,7 +145,7 @@ public class RabbitModel
                     for (int k = 0; k < kills; k++)
                     {
                         {
-                            int idx = Main.MT.nextInt((int) (this.births - this.deaths) - 1);
+                            int idx = Main.MT.nextInt((int) (this.getPop()));
                             unmakeRabbit(this.rabbits.get(idx));
                             this.rabbits.remove(idx);
                             // randomly drawing the victims among all pop --
@@ -162,7 +167,7 @@ public class RabbitModel
 
             String toWrite = this.births + ";" +
                              this.deaths + ";" +
-                             (this.births - this.deaths) + ";" +
+                             this.getPop() + ";" +
                              this.activePredators;
             FileStuff.writeToFile(fileName, toWrite);
             // TODO remove before shipping
@@ -173,7 +178,7 @@ public class RabbitModel
          * ...... at 156 months
          * ....... at 156 months with [4k;6k] predators
          */
-        return this.births - this.deaths;
+        return this.getPop();
         // TODO show graphs
     }
 }
