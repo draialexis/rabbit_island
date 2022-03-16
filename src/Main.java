@@ -1,7 +1,8 @@
-public class Main
+public final class Main
 {
-    static final MersenneTwisterFast MT;
-    static final int                 MAX_INT = 2147483647;
+    public static final MersenneTwisterFast MT;
+    public static final int                 MAX_INT         = 2147483647;
+    public static final int                 MONTHS_PER_YEAR = 12;
 
     static
     {
@@ -30,7 +31,7 @@ public class Main
 
         final int MALES   = 5;
         final int FEMALES = 10;
-        final int MONTHS  = 156; // increase at your own risks
+        final int MONTHS  = 240; // increase at your own risk
 
         double mean     = 0;
         double variance = 0;
@@ -61,13 +62,13 @@ public class Main
         }
         variance /= REPLICATES - 1;
 
-        // doing the math
+        // doing the math on confidence interval
         stdDeviation = Math.sqrt(variance);
         stdError = stdDeviation / Math.sqrt(REPLICATES);
         errorMargin = STUDENT_T * stdError;
 
         final String printout = "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n" +
-                                "after " + REPLICATES + " replicates of a " + (MONTHS / 12.0) +
+                                "after " + REPLICATES + " replicates of a " + (MONTHS / (MONTHS_PER_YEAR * 1.0)) +
                                 "-year-long experiment\n" +
                                 "with " + FEMALES + " female and " + MALES + " male starting rabbits\n" +
                                 "observed population levels were such:\n" +
@@ -84,6 +85,8 @@ public class Main
 
         // TODO doc
         // TODO add exception handling and validation
+        // TODO upodate README
+        // TODO use javadoc
     }
 
 }

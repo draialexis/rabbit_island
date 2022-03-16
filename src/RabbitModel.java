@@ -1,213 +1,286 @@
+import java.util.ArrayList;
 import java.util.LinkedList;
 
-public class RabbitModel
+public final class RabbitModel
 {
-    private static final int PREDATOR_THRESHOLD = 100_000;
+    private static final int    PREDATOR_THRESHOLD      = 50_000;                   // 50000 (added on top)
+    private static final double FEMALE_RATIO            = 0.5;                      // 0.5
+    private static final int    MEAN_KITS_PER_LITTER    = 4;                        // 4
+    private static final double STD_DEV_KITS_PER_LITTER = 2 / 3.0;                  // 0.6_ (2 / 3.0)
+    private static final double DEATH_IN_LABOR_RATE     = 0.15;                     // 0.15
+    private static final double MEAN_KILLS              = 5000.0;                   // 5000.0 (added on top)
+    private static final double STD_DEVIATION_KILLS     = 1000 / 3.0;               // 333.3_ (1000/3.0) (added on top)
 
-    private static int replNum = 1;
+    private static int nbOfReplicates = 1;
 
-    private final LinkedList<Rabbit> rabbits; // linked lists allow for insertions and removals in constant time
-    private final LinkedList<Rabbit> toRemove;
-    private final LinkedList<Rabbit> toAdd;
+    // linked lists take more space but allow for insertions and removals at O(1)
+    private final LinkedList<Rabbit> rabbits  = new LinkedList<>();
+    private final ArrayList<Rabbit>  toAdd    = new ArrayList<>();
+    private final ArrayList<Rabbit>  toRemove = new ArrayList<>();
+    //    private final ArrayList<Integer> toRemove = new ArrayList<>();
 
-    private long births; // storing pop figures as separate attributes to avoid having to call the lists size() methods
-    private long deaths; // ... and to have a better detailed vue
-    private int  activePredators;
+    // storing pop figures as separate attributes to avoid having to call the lists size() methods
+    // ... and also, in order to have a slightly better-detailed vue
+    private long    deaths             = 0;
+    private long    births             = 0;
+    private int     predators          = 0;
+    private boolean arePredatorsActive = false;
 
     public RabbitModel(int numFem, int numMal)
     {
-        this.rabbits = new LinkedList<>();
-        this.toRemove = new LinkedList<>();
-        this.toAdd = new LinkedList<>();
-        this.births = 0;
-        this.deaths = 0;
-        this.activePredators = 0;
         for (int i = 0; i < numFem + numMal; i++)
         {
+            // make as many female ones as requested, then the rest can be male
             this.rabbits.add(makeRabbit(i < numFem));
         }
     }
 
-    /**
-     * <strong>makeRabbit</strong>
-     * increments the number of births for this model and instantiates a new Rabbit
-     *
-     * @param isFemale whether the Rabbit is female or not
-     * @return a Rabbit instance of the given sex
-     */
-    private Rabbit makeRabbit(Boolean isFemale)
+    long getDeaths()
     {
-        this.births++;
-        return new Rabbit(isFemale);
+        return this.deaths;
+    }
+
+    long getBirths()
+    {
+        return this.births;
+    }
+
+    int getPredators()
+    {
+        return this.predators;
+    }
+
+    boolean arePredatorsActive()
+    {
+        return this.arePredatorsActive;
+    }
+
+    private void makePredatorsActive()
+    {
+        this.arePredatorsActive = true;
     }
 
     /**
-     * <strong>makeRabbit</strong>
-     * increments the number of births for this model and instantiates a new Rabbit with unspecified sex
+     * <h2>makeRabbit</h2>
+     * <p>simply calls {@link #makeRabbit(boolean)} with a random boolean
+     * based on {@link #FEMALE_RATIO}</p>
      *
-     * @return a Rabbit instance with unspecified sex
+     * @return a {@link Rabbit} instance with randomized sex
      */
     private Rabbit makeRabbit()
     {
-        this.births++;
-        return new Rabbit();
+        return this.makeRabbit(Main.MT.nextBoolean(FEMALE_RATIO));
     }
 
     /**
-     * <strong>destroyRabbit</strong>
-     * increments the number of deaths for this model and invokes a given Rabbit's <em>kill()</em> method
+     * <h2>makeRabbit</h2>
+     * <p>increments the number of births for this model and instantiates a new
+     * {@link Rabbit} of a predetermined sex.</p>
+     * <p>if that was a predator rabbit <small>(don't question it)</small>,
+     * it increments the number of predators as well.</p>
+     * <p><em>note that {@link FemaleRabbit} are a subclass of {@link Rabbit}</em></p>
      *
-     * @param rabbit the Rabbit instance to be destroyed
+     * @return a {@link Rabbit} instance of the determined sex
+     */
+    private Rabbit makeRabbit(boolean isFemale)
+    {
+        Rabbit rabbit;
+        this.births++;
+        if (isFemale)
+        {
+            rabbit = new FemaleRabbit();
+
+        }
+        else
+        {
+            rabbit = new Rabbit();
+        }
+        if (rabbit.isRabbitOfCaerbannog())
+        {
+            this.predators++;
+        }
+        return rabbit;
+    }
+
+    /**
+     * <h2>destroyRabbit</h2>
+     * <p>increments the number of deaths for this model and invokes a given {@link Rabbit}'s
+     * {@link Rabbit#kill()} method</p>
+     * <p>if that was a predator rabbit<small>(don't question it)</small>,
+     * decrements the number of predators as well</p>
+     *
+     * @param rabbit the {@link Rabbit} instance to be destroyed
      */
     private void destroyRabbit(Rabbit rabbit)
     {
         this.deaths++;
+        if (rabbit.isRabbitOfCaerbannog()) this.predators--;
         rabbit.kill();
     }
 
     /**
-     * <strong>getPop</strong>
-     * calculates the current population total for this model
+     * <h2>getPop</h2>
+     * <p>calculates the current population total for this model</p>
      *
-     * @return said population total
+     * @return the current population total
      */
     private long getPop()
     {
-        return this.births - this.deaths;
+        return this.getBirths() - this.getDeaths();
     }
 
     /**
+     * <h2>cull</h2>
+     * <p>decreases the population total by a number proportional to the number of predators in the model</p>
+     */
+    private void cull()
+    {
+        if (this.getPop() <= Main.MAX_INT)
+        {
+            for (int j = 0; j < this.getPredators(); j++)
+            {
+                //                    if (this.getPop() >= PREDATOR_THRESHOLD)
+                //                    {
+                int kills = (int) Math.round(Main.MT.nextGaussian()
+                                             * STD_DEVIATION_KILLS
+                                             + MEAN_KILLS);
+                // this casting should be fine, since there are less than MAX_INT rabbits
+
+                //                    }
+                //                    else
+                //                    {
+                //                        this.predatorsAreActive = false; // we had a few... overkill problems
+                //                    }
+                for (int k = 0; k < kills; k++)
+                {
+                    {
+                        int idx = Main.MT.nextInt((int) (this.getPop()));
+                        this.destroyRabbit(this.rabbits.get(idx));
+                        this.rabbits.remove(idx);
+                        // randomly drawing the victims among all pop --
+                    }
+                }
+            }
+        }
+        else
+        {
+            throw new RuntimeException("so, we're looking at " + Main.MAX_INT +
+                                       "+ rabbits. This shouldn't have happened");
+        }
+    }
+
+    /**
+     * <h2>run</h2>
+     * <p>runs the model through a certain number of steps</p>
      *
-     * @param months
-     * @return
+     * @param months the number of steps through which the model will be run
+     * @return the final population total
      */
     long run(int months)
     {
-        String fileName = "rabbits" + months + "m_i" + replNum++ + ".csv";// TODO remove before shipping
+        String fileName = "rabbits" + months + "m_i" + nbOfReplicates++ + ".csv";// TODO remove before shipping
         FileStuff.createFile(fileName);// TODO remove before shipping
         FileStuff.writeToFile(fileName, "births;deaths;pop;predators");// TODO remove before shipping
 
-        double ratio    = 0.0, mean = 0.0;
-        long   prevTime = 0, crtTime;
+        double ratio    = 0.0, meanRatio = 0.0;// TODO remove before shipping
+        long   prevTime = 0, crtTime;// TODO remove before shipping
 
-        for (int j = 1; j <= months; j++)
+        for (int month = 1; month <= months; month++)
         {
-            long start = System.nanoTime();
-            System.out.println("\nmonth=" + j);
-            for (Rabbit rabbit : this.rabbits)
+            long start = System.nanoTime();// TODO remove before shipping
+            System.out.println("\nmonth=" + month);
+            for (int rabbitIdx = 0; rabbitIdx < this.rabbits.size(); rabbitIdx++)
             {
-                rabbit.ageUp(); // ageing rabbits first
+                Rabbit rabbit = this.rabbits.get(rabbitIdx);
+
+                // ageing rabbits first
+                if (!rabbit.isDead())
+                {
+                    rabbit.ageUp();
+                }
+                // isDead() might have just been updated
+                // removing inactive elements ASAP
                 if (rabbit.isDead())
                 {
-                    //                    System.out.print(rabbit.getAgeInMonths() + ", ");
-                    destroyRabbit(rabbit);
+                    this.destroyRabbit(rabbit);
                     this.toRemove.add(rabbit);
-                    continue; // no need to check further
+                    //                    this.toRemove.add(rabbitIdx);
+                    continue; // we're done with this rabbit
                 }
-                // then checking for births
+                // checking for births due in that specific rabbit's month
                 if
                 (
-                        rabbit.isFemale()
-                        && rabbit.isFertile()
-                        && rabbit.getWillGiveBirth()[rabbit.getAgeInMonths() % 12]
-                    // accessing willGiveBirth, an individualized 12-month birth planner, to check for due births
+                        rabbit instanceof FemaleRabbit &&
+                        ((FemaleRabbit) rabbit).getPregnancyPlanner()[rabbit.getAgeInMonths() % Main.MONTHS_PER_YEAR]
                 )
                 {
-                    if (Main.MT.nextBoolean(Rabbit.DEATH_IN_LABOR_RATE)) // death during labor also kills the offspring
+                    // checking for deaths during labor
+                    // which also prevents the would-be offspring from being born
+                    if (Main.MT.nextBoolean(DEATH_IN_LABOR_RATE))
                     {
-                        destroyRabbit(rabbit);
+                        this.destroyRabbit(rabbit);
                         this.toRemove.add(rabbit);
+                        //                    this.toRemove.add(rabbitIdx);
+                        continue;
                     }
                     else
                     {
-                        double rdm = Math.round(Main.MT.nextGaussian()
-                                                * Rabbit.STD_DEVIATION_KITS_PER_LITTER
-                                                + Rabbit.MEAN_KITS_PER_LITTER);
-                        int kits = (int) rdm; // explicitly casting long into an int
-                        for (int k = 0; k < kits; k++)
+                        int kitten = (int) Math.round(Main.MT.nextGaussian()
+                                                      * STD_DEV_KITS_PER_LITTER
+                                                      + MEAN_KITS_PER_LITTER);
+                        // explicitly casting long into an int, should be fine with the numbers we expect
+                        for (int kit = 0; kit < kitten; kit++)
                         {
-                            this.toAdd.add(makeRabbit());
+                            this.toAdd.add(this.makeRabbit());
                         }
                     }
                 }
-                if (rabbit.isRabbitOfCaerbannog())
+                // dealing with overpopulation using predators
+                // under the pop threshold, all predators go back to alfalfa and carrots
+                if (this.getPop() >= PREDATOR_THRESHOLD)
                 {
-                    if (this.births - this.deaths >= PREDATOR_THRESHOLD)
-                    {
-                        // Ok, that's enough rabbits
-                        this.activePredators++;
-                    }
-                    else
-                    {
-                        if (this.activePredators > 0)
-                        {
-                            // all predators go back to alfalfa and carrots if the population shrinks low enough
-                            this.activePredators = 0;
-                        }
-                    }
+                    this.makePredatorsActive();
                 }
+
             }
-            // removing inactive cells to avoid stack-overflow and performance issues
+            // removing inactive cells to avoid stack overflow and performance issues
             // using auxiliary lists, for pop evolution, to avoid concurrent modification errors at runtime
-            // iterators are cool for removing elements mid-loop, but adding elements on top gets complicated
+            // iterators are cool for removing elements mid-loop, but adding elements on top gets tricky
+/*            for (int rabbitIdx : this.toRemove)
+            {
+                // using a dead rabbit's index in the rabbits list, to guarantee removal in O(1)*toAdd.size()
+                this.rabbits.remove(rabbitIdx);
+            }
+            // this addAll() should also be in O(1)*toAdd.size()*/
             this.rabbits.removeAll(this.toRemove);
-            this.toRemove.clear();
             this.rabbits.addAll(this.toAdd);
+            this.toRemove.clear();
             this.toAdd.clear();
 
-            if (this.births - this.deaths <= Main.MAX_INT)
+            if (this.arePredatorsActive())
             {
-                int kills = 0;
-
-                for (int i = 0; i < this.activePredators; i++)
-                {
-                    if (this.births - this.deaths >= PREDATOR_THRESHOLD)
-                    {
-                        double rdm = Math.round(Main.MT.nextGaussian()
-                                                * Rabbit.STD_DEVIATION_KILLS
-                                                + Rabbit.MEAN_KILLS);
-                        kills = (int) rdm; // this should be fine, as long as there are less than 2_147_483_647 rabbits
-                    }
-                    else
-                    {
-                        this.activePredators = 0; // we had some... overkill problems
-                    }
-                    for (int k = 0; k < kills; k++)
-                    {
-                        {
-                            int idx = Main.MT.nextInt((int) (this.getPop()));
-                            destroyRabbit(this.rabbits.get(idx));
-                            this.rabbits.remove(idx);
-                            // randomly drawing the victims among all pop --
-                        }
-                    }
-                }
+                this.cull();
             }
 
-            long end = System.nanoTime();
-            crtTime = end - start;
+            crtTime = System.nanoTime() - start;
             if (prevTime != 0)
             {
                 ratio = crtTime / (double) prevTime;
-                mean += ratio;
+                meanRatio += ratio;
             }
             System.out.println("Elapsed Time: " + crtTime + " ns");
             System.out.println("Ratio: " + (ratio != 0.0 ? ratio : "N/A"));
             prevTime = crtTime;
 
-            String toWrite = this.births + ";" +
-                             this.deaths + ";" +
+            String toWrite = this.getBirths() + ";" +
+                             this.getDeaths() + ";" +
                              this.getPop() + ";" +
-                             this.activePredators;
+                             this.getPredators();
             FileStuff.writeToFile(fileName, toWrite);
             // TODO remove before shipping
         }
-        mean /= months - 1;
-        System.out.println("mean ratio=" + mean);
-        /*
-         * ...... at 156 months
-         * ....... at 156 months with [4k;6k] predators
-         */
+        meanRatio /= months - 1;
+        System.out.println("mean ratio=" + meanRatio);
         return this.getPop();
         // TODO show graphs
     }
