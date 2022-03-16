@@ -28,29 +28,59 @@ public class RabbitModel
         }
     }
 
+    /**
+     * <strong>makeRabbit</strong>
+     * increments the number of births for this model and instantiates a new Rabbit
+     *
+     * @param isFemale whether the Rabbit is female or not
+     * @return a Rabbit instance of the given sex
+     */
     private Rabbit makeRabbit(Boolean isFemale)
     {
         this.births++;
         return new Rabbit(isFemale);
     }
 
+    /**
+     * <strong>makeRabbit</strong>
+     * increments the number of births for this model and instantiates a new Rabbit with unspecified sex
+     *
+     * @return a Rabbit instance with unspecified sex
+     */
     private Rabbit makeRabbit()
     {
         this.births++;
         return new Rabbit();
     }
 
-    private void unmakeRabbit(Rabbit rabbit)
+    /**
+     * <strong>destroyRabbit</strong>
+     * increments the number of deaths for this model and invokes a given Rabbit's <em>kill()</em> method
+     *
+     * @param rabbit the Rabbit instance to be destroyed
+     */
+    private void destroyRabbit(Rabbit rabbit)
     {
         this.deaths++;
         rabbit.kill();
     }
 
+    /**
+     * <strong>getPop</strong>
+     * calculates the current population total for this model
+     *
+     * @return said population total
+     */
     private long getPop()
     {
         return this.births - this.deaths;
     }
 
+    /**
+     *
+     * @param months
+     * @return
+     */
     long run(int months)
     {
         String fileName = "rabbits" + months + "m_i" + replNum++ + ".csv";// TODO remove before shipping
@@ -70,7 +100,7 @@ public class RabbitModel
                 if (rabbit.isDead())
                 {
                     //                    System.out.print(rabbit.getAgeInMonths() + ", ");
-                    unmakeRabbit(rabbit);
+                    destroyRabbit(rabbit);
                     this.toRemove.add(rabbit);
                     continue; // no need to check further
                 }
@@ -85,7 +115,7 @@ public class RabbitModel
                 {
                     if (Main.MT.nextBoolean(Rabbit.DEATH_IN_LABOR_RATE)) // death during labor also kills the offspring
                     {
-                        unmakeRabbit(rabbit);
+                        destroyRabbit(rabbit);
                         this.toRemove.add(rabbit);
                     }
                     else
@@ -146,7 +176,7 @@ public class RabbitModel
                     {
                         {
                             int idx = Main.MT.nextInt((int) (this.getPop()));
-                            unmakeRabbit(this.rabbits.get(idx));
+                            destroyRabbit(this.rabbits.get(idx));
                             this.rabbits.remove(idx);
                             // randomly drawing the victims among all pop --
                         }

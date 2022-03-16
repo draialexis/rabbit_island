@@ -13,7 +13,6 @@ public class Main
     {
 
         System.out.println("================= 1) Simple rabbit pop sim (fibo) =================");
-
         long pop = 0;
         int  i   = 0;
         while (pop < 8_000_000_000L)
@@ -23,9 +22,8 @@ public class Main
         System.out.println("\nOk, that's enough rabbits\n");
 
         System.out.println("================= 2) Dank ill rabbit pop sim (actual sim) =================");
-
-        final int    REPLICATES = 50; // DO NOT CHANGE, depends on STUDENT_T
-        final double STUDENT_T  = 2.68; // DO NOT CHANGE, depends on REPLICATES
+        final int    REPLICATES = 50; // STUDENT_T depends on this
+        final double STUDENT_T  = 2.68; // depends on REPLICATES
         // refer to https://www.supagro.fr/cnam-lr/statnet/tables.htm for co-dependant values
 
         final String fileName = "rabbit_pop_results.txt";
@@ -40,28 +38,30 @@ public class Main
         double stdError;
         double errorMargin;
         long[] results  = new long[REPLICATES];
-        long   result;
 
+        long tmp;
+
+        // logging results and calculating estimated mean
         FileStuff.createFile(fileName);
         for (i = 0; i < REPLICATES; i++)
         {
             RabbitModel model = new RabbitModel(FEMALES, MALES);
-
-            result = model.run(MONTHS);
-
-            FileStuff.writeToFile(fileName, result + ",");
-            results[i] = result;
-            mean += result;
+            // getting final pop results
+            tmp = model.run(MONTHS);
+            mean += tmp;
+            results[i] = tmp;
+            FileStuff.writeToFile(fileName, tmp + ",");
         }
-
         mean /= REPLICATES;
 
+        // calculating the variance using previous results
         for (i = 0; i < REPLICATES; i++)
         {
             variance += Math.pow((results[i] - mean), 2);
         }
-
         variance /= REPLICATES - 1;
+
+        // doing the math
         stdDeviation = Math.sqrt(variance);
         stdError = stdDeviation / Math.sqrt(REPLICATES);
         errorMargin = STUDENT_T * stdError;
@@ -78,8 +78,8 @@ public class Main
                                 "margin of error = " + errorMargin + "\n" +
                                 "99% confidence interval = [" + (mean - errorMargin) + "," + (mean + errorMargin) + "]";
 
+        // logging and printing out results
         FileStuff.writeToFile(fileName, printout);
-
         System.out.println(printout);
 
         // TODO doc

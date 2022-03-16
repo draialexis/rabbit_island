@@ -127,11 +127,17 @@ public class Rabbit
         return ageInMonths;
     }
 
+    /**
+     *
+     */
     public void kill()
     {
         this.isDead = true;
     }
 
+    /**
+     *
+     */
     private void updateDead()
     {
         double rdm = Main.MT.nextDouble();
@@ -164,6 +170,9 @@ public class Rabbit
         }
     }
 
+    /**
+     *
+     */
     private void updateYearlyDue()
     {
         this.resetWillGiveBirth();
@@ -184,6 +193,9 @@ public class Rabbit
         }
     }
 
+    /**
+     *
+     */
     private void resetWillGiveBirth()
     {
         for (int i = 0; i < 12; i++)
@@ -192,6 +204,9 @@ public class Rabbit
         }
     }
 
+    /**
+     *
+     */
     public void ageUp()
     {
         this.ageInMonths++;
