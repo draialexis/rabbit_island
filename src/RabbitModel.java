@@ -8,8 +8,8 @@ public final class RabbitModel
     private static final int    MEAN_KITS_PER_LITTER    = 4;                        // 4
     private static final double STD_DEV_KITS_PER_LITTER = 2 / 3.0;                  // 0.6_ (2 / 3.0)
     private static final double DEATH_IN_LABOR_RATE     = 0.15;                     // 0.15
-    private static final double MEAN_KILLS              = 5000.0;                   // 5000.0 (added on top)
-    private static final double STD_DEVIATION_KILLS     = 1000 / 3.0;               // 333.3_ (1000/3.0) (added on top)
+    private static final double MEAN_KILLS              = 7000;                     // 5000.0 (added on top)
+    private static final double STD_DEVIATION_KILLS     = 1000.0;                   // 1000.0 (added on top)
 
     private static int nbOfReplicates = 1;
 
@@ -55,9 +55,9 @@ public final class RabbitModel
         return this.arePredatorsActive;
     }
 
-    private void makePredatorsActive()
+    private void setPredatorsActive(boolean arePredatorsActive)
     {
-        this.arePredatorsActive = true;
+        this.arePredatorsActive = arePredatorsActive;
     }
 
     /**
@@ -139,18 +139,19 @@ public final class RabbitModel
         {
             for (int j = 0; j < this.getPredators(); j++)
             {
-                //                    if (this.getPop() >= PREDATOR_THRESHOLD)
-                //                    {
-                int kills = (int) Math.round(Main.MT.nextGaussian()
+                int kills;
+                if (this.getPop() >= PREDATOR_THRESHOLD)
+                {
+                    kills = (int) Math.round(Main.MT.nextGaussian()
                                              * STD_DEVIATION_KILLS
                                              + MEAN_KILLS);
-                // this casting should be fine, since there are less than MAX_INT rabbits
-
-                //                    }
-                //                    else
-                //                    {
-                //                        this.predatorsAreActive = false; // we had a few... overkill problems
-                //                    }
+                    // this casting should be fine, since there are less than MAX_INT rabbits
+                }
+                else
+                {
+                    this.setPredatorsActive(false);
+                    return;
+                }
                 for (int k = 0; k < kills; k++)
                 {
                     {
@@ -189,10 +190,8 @@ public final class RabbitModel
         {
             long start = System.nanoTime();// TODO remove before shipping
             System.out.println("\nmonth=" + month);
-            for (int rabbitIdx = 0; rabbitIdx < this.rabbits.size(); rabbitIdx++)
+            for (Rabbit rabbit : this.rabbits)
             {
-                Rabbit rabbit = this.rabbits.get(rabbitIdx);
-
                 // ageing rabbits first
                 if (!rabbit.isDead())
                 {
@@ -204,7 +203,6 @@ public final class RabbitModel
                 {
                     this.destroyRabbit(rabbit);
                     this.toRemove.add(rabbit);
-                    //                    this.toRemove.add(rabbitIdx);
                     continue; // we're done with this rabbit
                 }
                 // checking for births due in that specific rabbit's month
@@ -220,7 +218,6 @@ public final class RabbitModel
                     {
                         this.destroyRabbit(rabbit);
                         this.toRemove.add(rabbit);
-                        //                    this.toRemove.add(rabbitIdx);
                         continue;
                     }
                     else
@@ -239,19 +236,13 @@ public final class RabbitModel
                 // under the pop threshold, all predators go back to alfalfa and carrots
                 if (this.getPop() >= PREDATOR_THRESHOLD)
                 {
-                    this.makePredatorsActive();
+                    this.setPredatorsActive(true);
                 }
 
             }
             // removing inactive cells to avoid stack overflow and performance issues
             // using auxiliary lists, for pop evolution, to avoid concurrent modification errors at runtime
             // iterators are cool for removing elements mid-loop, but adding elements on top gets tricky
-/*            for (int rabbitIdx : this.toRemove)
-            {
-                // using a dead rabbit's index in the rabbits list, to guarantee removal in O(1)*toAdd.size()
-                this.rabbits.remove(rabbitIdx);
-            }
-            // this addAll() should also be in O(1)*toAdd.size()*/
             this.rabbits.removeAll(this.toRemove);
             this.rabbits.addAll(this.toAdd);
             this.toRemove.clear();
