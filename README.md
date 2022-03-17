@@ -1,5 +1,7 @@
 # Rabbits everywhere
 
+**Check `rabbit_doc/index.html` to see the appropriate Javadoc**
+
 Simulating rabbit population growth, with replicate experiments, given a few factors:
 
 * number of replicates
