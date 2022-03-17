@@ -16,8 +16,8 @@ public final class RabbitModel
     private static final int    MEAN_KITS_PER_LITTER    = 4;                        // 4
     private static final double STD_DEV_KITS_PER_LITTER = 2 / 3.0;                  // 0.6_ (2 / 3.0)
     private static final double DEATH_IN_LABOR_RATE     = 0.15;                     // 0.15
-    private static final double MEAN_KILLS              = 2000;                     // 2000 (added on top)
-    private static final double STD_DEVIATION_KILLS     = 1000 / 3.0;               // 333.33_ (added on top)
+    private static final double MEAN_KILLS              = 4000;                     // 2000 (added on top)
+    private static final double STD_DEVIATION_KILLS     = 1000;                     // 1000 (added on top)
 
     private static int nbOfReplicates = 1;
 
@@ -130,9 +130,14 @@ public final class RabbitModel
      *
      * @return the current population total
      */
-    private long getPop()
+    private int getPop()
     {
-        return this.getBirths() - this.getDeaths();
+        long res = this.getBirths() - this.getDeaths();
+        if (res > Main.MAX_INT)
+        {
+            throw new RuntimeException("We're looking at " + res + " rabbits here. Better stop now");
+        }
+        return (int) res;
     }
 
     /**
@@ -140,57 +145,49 @@ public final class RabbitModel
      */
     private void cull()
     {
-        if (this.getPop() <= Main.MAX_INT)
+        if (this.getPredators() > 0)
         {
-            if (this.getPredators() > 0)
+            for (int j = 0; j < this.getPredators(); j++)
             {
-                for (int j = 0; j < this.getPredators(); j++)
+                if (this.getPop() < PREDATOR_THRESHOLD)
                 {
-                    if (this.getPop() < PREDATOR_THRESHOLD)
-                    {
-                        this.setPredatorsActive(false);
-                        return;
-                    }
-                    int k = 0;
-                    int kills = (int) Math.round(Main.MT.nextGaussian()
-                                                 * STD_DEVIATION_KILLS
-                                                 + MEAN_KILLS);
-                    // this casting should be fine, since there are less than MAX_INT rabbits
+                    this.setPredatorsActive(false);
+                    return;
+                }
+                int k = 0;
+                int kills = (int) Math.round(Main.MT.nextGaussian()
+                                             * STD_DEVIATION_KILLS
+                                             + MEAN_KILLS);
+                // this casting should be fine, since there are less than MAX_INT rabbits
 
-                    Iterator<Rabbit> it = this.rabbits.iterator();
-                    while (k < kills && it.hasNext())
-                    {
-                        // counting on HashSets being randomly arranged for randomly drawing the victims among all pop --
-                        this.destroyRabbit(it.next());
-                        it.remove();
-                        k++;
-                    }
+                Iterator<Rabbit> it = this.rabbits.iterator();
+                while (k < kills && it.hasNext())
+                {
+                    // counting on HashSets being randomly arranged for randomly drawing the victims among all pop --
+                    this.destroyRabbit(it.next());
+                    it.remove();
+                    k++;
                 }
             }
-        }
-        else
-        {
-            throw new RuntimeException("so, we're looking at " + Main.MAX_INT +
-                                       "+ rabbits. This should never have happened");
         }
     }
 
     /**
-     * <p>runs the {@link RabbitModel} through a given number of steps (months), while timing the execution and recording resulting data to text files</p>
+     * <p>runs the {@link RabbitModel} through a statically given number of steps (months),
+     * while timing the execution and recording resulting data to text files</p>
      *
-     * @param months the number of steps through which the model will be run
      * @return the final population total
      */
-    long run(int months)
+    int run()
     {
-        String fileName = "data_results/rabbits" + months + "m_i" + nbOfReplicates + ".csv";
+        String fileName = "data_results/rabbits" + Main.TOTAL_MONTHS + "m_i" + nbOfReplicates + ".csv";
         FileStuff.createFile(fileName);
         FileStuff.writeToFile(fileName, "births;deaths;pop;predators");
 
         double ratio    = 0.0, meanRatio = 0.0;
         long   prevTime = 0, crtTime;
 
-        for (int month = 1; month <= months; month++)
+        for (int month = 1; month <= Main.TOTAL_MONTHS; month++)
         {
             long start = System.nanoTime();
             System.out.println("\nrep_" + nbOfReplicates + "_month_" + month);
@@ -272,7 +269,7 @@ public final class RabbitModel
                              this.getPredators();
             FileStuff.writeToFile(fileName, toWrite);
         }
-        meanRatio /= months;
+        meanRatio /= Main.TOTAL_MONTHS;
         System.out.println("mean ratio=" + meanRatio);
         nbOfReplicates++;
         return this.getPop();

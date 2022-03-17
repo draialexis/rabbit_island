@@ -13,8 +13,11 @@ public final class Main
         MT = new MersenneTwisterFast(new int[]{0x123, 0x234, 0x345, 0x456});
     }
 
-    public static final int MAX_INT         = 2147483647;
-    public static final int MONTHS_PER_YEAR = 12;
+    public static final int MAX_INT              = 2147483647;
+    public static final int MONTHS_PER_YEAR      = 12;
+
+    public static final int YEARS_PER_EXPERIMENT = 20;
+    public static final int TOTAL_MONTHS         = MONTHS_PER_YEAR * YEARS_PER_EXPERIMENT;
 
     public static void main(String[] args)
     {
@@ -37,7 +40,6 @@ public final class Main
 
         final int MALES   = 5;
         final int FEMALES = 10;
-        final int MONTHS  = 240; // increase at your own risk
 
         double mean     = 0;
         double variance = 0;
@@ -46,7 +48,7 @@ public final class Main
         double errorMargin;
         long[] results  = new long[REPLICATES];
 
-        long tmp;
+        int tmp;
 
         // logging results and calculating estimated mean
         FileStuff.createFile(fileName);
@@ -54,7 +56,7 @@ public final class Main
         {
             RabbitModel model = new RabbitModel(FEMALES, MALES);
             // getting final pop results
-            tmp = model.run(MONTHS);
+            tmp = model.run();
             mean += tmp;
             results[i] = tmp;
             FileStuff.writeToFile(fileName, tmp + ",");
@@ -74,7 +76,7 @@ public final class Main
         errorMargin = STUDENT_T * stdError;
 
         final String printout = "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n" +
-                                "after " + REPLICATES + " replicates of a " + (MONTHS / (MONTHS_PER_YEAR * 1.0)) +
+                                "after " + REPLICATES + " replicates of a " + TOTAL_MONTHS +
                                 "-year-long experiment\n" +
                                 "with " + FEMALES + " female and " + MALES + " male starting rabbits\n" +
                                 "observed population levels were such:\n" +
