@@ -1,3 +1,5 @@
+package com.alexisdrai.util;
+
 import java.io.*;
 import java.util.*;
 

@@ -1,3 +1,5 @@
+package com.alexisdrai.popsim;
+
 public class Rabbit
 {
     private static final int      EARLIEST_MATURITY_START      = 5;           // 5
@@ -78,8 +80,7 @@ public class Rabbit
     }
 
     /**
-     * maturificate
-     * <p>simply sets this rabbit's {@code isMature} property to true.</p>
+     * <p>simply sets this {@link Rabbit}'s {@link #isMature} property to true, if it turns out to be of age and not mature yet.</p>
      */
     void maturificate()
     {
@@ -91,9 +92,7 @@ public class Rabbit
     }
 
     /**
-     * kill
-     * <p>simply sets this rabbit's {@code isDead} property to true.</p>
-     * <p>since the reverse should not be done, no need for a setter.</p>
+     * <p>simply sets this rabbit's {@link #isDead} property to true. Since the reverse should not be done, no need for a setter.</p>
      */
     final void kill()
     {
@@ -104,8 +103,7 @@ public class Rabbit
     }
 
     /**
-     * checkDead
-     * <p></p>
+     * <p>examines whether a {@link Rabbit} should die, according to mortality rates and {@link #ageInMonths}, in which case it does</p>
      */
     private void checkDead()
     {
@@ -141,8 +139,7 @@ public class Rabbit
     }
 
     /**
-     * ageUp
-     * <p>increments a rabbit's age by one month, then checks for death and maturity</p>
+     * <p>increments a {@link Rabbit}'s {@link #ageInMonths} by one month, then calls checks for death and maturity</p>
      */
     void ageUp()
     {

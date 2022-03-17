@@ -1,3 +1,10 @@
+package com.alexisdrai.popsim;
+
+import com.alexisdrai.util.FileStuff;
+import com.alexisdrai.util.MersenneTwisterFast;
+
+//TODO link javadoc in README
+
 public final class Main
 {
     public static final MersenneTwisterFast MT;
@@ -28,7 +35,7 @@ public final class Main
         final double STUDENT_T  = 2.68; // depends on REPLICATES
         // refer to https://www.supagro.fr/cnam-lr/statnet/tables.htm for co-dependant values
 
-        final String fileName = "data/rabbit_pop_results.txt";
+        final String fileName = "build/com/alexisdrai/popsim/data/rabbit_pop_results.txt";
 
         final int MALES   = 5;
         final int FEMALES = 10;
@@ -83,11 +90,6 @@ public final class Main
         // logging and printing out results
         FileStuff.writeToFile(fileName, printout);
         System.out.println(printout);
-
-        // TODO doc
-        // TODO add exception handling and validation
-        // TODO upodate README
-        // TODO use javadoc
     }
 
 }

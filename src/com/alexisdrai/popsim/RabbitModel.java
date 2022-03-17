@@ -1,3 +1,7 @@
+package com.alexisdrai.popsim;
+
+import com.alexisdrai.util.FileStuff;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -78,6 +82,7 @@ public final class RabbitModel
      * it increments the number of predators as well.</p>
      * <p><em>note that {@link FemaleRabbit} are a subclass of {@link Rabbit}</em></p>
      *
+     * @param isFemale said predetermined sex: {@code true} for {@link FemaleRabbit}, {@code false} for {@link Rabbit}
      * @return a {@link Rabbit} instance of the determined sex
      */
     private Rabbit makeRabbit(boolean isFemale)
@@ -166,23 +171,23 @@ public final class RabbitModel
     }
 
     /**
-     * <p>runs the model through a certain number of steps (months)</p>
+     * <p>runs the {@link RabbitModel} through a given number of steps (months), while timing the execution and recording resulting data to text files</p>
      *
      * @param months the number of steps through which the model will be run
      * @return the final population total
      */
     long run(int months)
     {
-        String fileName = "data/rabbits" + months + "m_i" + nbOfReplicates + ".csv";// TODO remove before shipping
-        FileStuff.createFile(fileName);// TODO remove before shipping
-        FileStuff.writeToFile(fileName, "births;deaths;pop;predators");// TODO remove before shipping
+        String fileName = "rabbits" + months + "m_i" + nbOfReplicates + ".csv";
+        FileStuff.createFile(fileName);
+        FileStuff.writeToFile(fileName, "births;deaths;pop;predators");
 
-        double ratio    = 0.0, meanRatio = 0.0;// TODO remove before shipping
-        long   prevTime = 0, crtTime;// TODO remove before shipping
+        double ratio    = 0.0, meanRatio = 0.0;
+        long   prevTime = 0, crtTime;
 
         for (int month = 1; month <= months; month++)
         {
-            long start = System.nanoTime();// TODO remove before shipping
+            long start = System.nanoTime();
             System.out.println("\nrep_" + nbOfReplicates + "_month_" + month);
             for (Rabbit rabbit : this.rabbits)
             {
@@ -262,12 +267,10 @@ public final class RabbitModel
                              this.getPop() + ";" +
                              this.getPredators();
             FileStuff.writeToFile(fileName, toWrite);
-            // TODO remove before shipping
         }
         meanRatio /= months - 1;
         System.out.println("mean ratio=" + meanRatio);
         nbOfReplicates++;
         return this.getPop();
-        // TODO show graphs
     }
 }

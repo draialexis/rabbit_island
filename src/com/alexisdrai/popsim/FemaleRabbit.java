@@ -1,3 +1,5 @@
+package com.alexisdrai.popsim;
+
 public final class FemaleRabbit extends Rabbit
 {
 
@@ -8,9 +10,10 @@ public final class FemaleRabbit extends Rabbit
 
     private final boolean isPotentiallyFertile;
 
-    private       boolean   isFertile        = false;
+    private boolean isFertile = false;
+
     /**
-     * an individualized 12-month birth planner
+     * <p>an individualized 12-month birth planner, in the form of an array of booleans</p>
      */
     private final boolean[] pregnancyPlanner = new boolean[]{
             false,
@@ -33,9 +36,7 @@ public final class FemaleRabbit extends Rabbit
     }
 
     /**
-     * getPregnancyPlanner
-     *
-     * @return provides a copy of its own {@link #pregnancyPlanner}
+     * @return provides a copy of a {@link FemaleRabbit}'s {@link #pregnancyPlanner}
      */
     boolean[] getPregnancyPlanner()
     {
@@ -67,8 +68,7 @@ public final class FemaleRabbit extends Rabbit
     }
 
     /**
-     * updatePregnancyPlanner
-     * <p>index origin is based on the rabbit's maturation anniversary</p>
+     * <p>updates a {@link FemaleRabbit}'s {@link #pregnancyPlanner}; index origin is based on the rabbit's maturation anniversary</p>
      */
     private void updatePregnancyPlanner()
     {
@@ -106,7 +106,7 @@ public final class FemaleRabbit extends Rabbit
     }
 
     /**
-     * wipePregnancyPlanner
+     * <p>empties all of a {@link FemaleRabbit}'s {@link #pregnancyPlanner} and sets its elements to {@code false} </p>
      */
     private void wipePregnancyPlanner()
     {
@@ -117,7 +117,7 @@ public final class FemaleRabbit extends Rabbit
     }
 
     /**
-     * maturificate
+     * <p>simply sets this {@link FemaleRabbit}'s {@code isMature} property to true, if it turns out to be of age and not mature yet.</p>
      */
     @Override
     void maturificate()
@@ -130,8 +130,7 @@ public final class FemaleRabbit extends Rabbit
     }
 
     /**
-     * ageUp
-     * <p>increments a rabbit's age by one month, then checks for death and maturity, and finally plans out yearly litters</p>
+     * <p>increments a {@link FemaleRabbit}'s {@code ageInMonths} by one month, then calls checks for death and maturity, and finally plans out yearly litters</p>
      */
     @Override
     void ageUp()

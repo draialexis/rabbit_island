@@ -11,10 +11,13 @@ Simulating rabbit population growth, with replicate experiments, given a few fac
 * range of possible values for maturity threshold
 * female infertility rate
 * general mortality rates depending on age
+* size of female fertility window
 * rudimentary predator role: predator to prey ratio, rate of monthly kills per predator, thresholds
 
 This program then estimates a mean final population count for the given duration, and uses variance and t-distribution
 to determine a 99% confidence interval for a _true mean_ for said final count.
+
+The resulting data will be found in `build/com/alexisdrai/popsim/data/` after execution
 
 This program uses [`MersenneTwisterFast`](https://javadoc.scijava.org/SciJava/org/scijava/util/MersenneTwisterFast.html)
 for pseudorandom number generation.
@@ -31,8 +34,8 @@ means iterating through the `run` function will take exponentially more time._
 
 ## Compilation and execution
 
-`javac -Xlint:all -d build com/alexisdrai/src/*.java`
+`javac -Xlint:all -d build src/com/alexisdrai/popsim/*.java src/com/alexisdrai/util/*.java`
 
 &&
 
-`java -cp build Main`
+`java -cp build com.alexisdrai.popsim.Main`

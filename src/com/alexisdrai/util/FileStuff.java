@@ -1,8 +1,10 @@
+package com.alexisdrai.util;
+
 import java.io.*;
 
 public class FileStuff
 {
-    static void createFile(String fileName)
+    public static void createFile(String fileName)
     {
         try
         {
@@ -11,10 +13,10 @@ public class FileStuff
             {
                 System.out.println("File created: " + myObj.getName());
             }
-            else// TODO remove before shipping
-            {// TODO remove before shipping
-                throw new RuntimeException("file already exists");// TODO remove before shipping
-            }// TODO remove before shipping
+            else
+            {
+                throw new RuntimeException("file already exists, please delete or remove them first");
+            }
         } catch (IOException e)
         {
             System.out.println("file creating error");
@@ -22,7 +24,7 @@ public class FileStuff
         }
     }
 
-    static void writeToFile(String fileName, String s)
+    public static void writeToFile(String fileName, String s)
     {
         try
                 (
