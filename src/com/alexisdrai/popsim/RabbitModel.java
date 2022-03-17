@@ -184,13 +184,13 @@ public final class RabbitModel
         FileStuff.createFile(fileName);
         FileStuff.writeToFile(fileName, "births;deaths;pop;predators");
 
-        double ratio    = 0.0, meanRatio = 0.0;
-        long   prevTime = 0, crtTime;
+        //        double ratio    = 0.0, meanRatio = 0.0;
+        //        long   prevTime = 0, crtTime;
 
         for (int month = 1; month <= Main.TOTAL_MONTHS; month++)
         {
-            long start = System.nanoTime();
-            System.out.println("\nrep_" + nbOfReplicates + "_month_" + month);
+            //            long start = System.nanoTime();
+            //            System.out.println("\nrep_" + nbOfReplicates + "_month_" + month);
             Iterator<Rabbit> it = this.rabbits.iterator();
             while (it.hasNext())
             {
@@ -253,15 +253,15 @@ public final class RabbitModel
                 this.cull();
             }
 
-            crtTime = System.nanoTime() - start;
-            if (prevTime != 0)
-            {
-                ratio = crtTime / (double) prevTime;
-                meanRatio += ratio;
-            }
-            System.out.println("Elapsed Time: " + crtTime + " ns");
-            System.out.println("Ratio: " + (ratio != 0.0 ? ratio : "N/A"));
-            prevTime = crtTime;
+            //            crtTime = System.nanoTime() - start;
+            //            if (prevTime != 0)
+            //            {
+            //                ratio = crtTime / (double) prevTime;
+            //                meanRatio += ratio;
+            //            }
+            //            System.out.println("Elapsed Time: " + crtTime + " ns");
+            //            System.out.println("Ratio: " + (ratio != 0.0 ? ratio : "N/A"));
+            //            prevTime = crtTime;
 
             String toWrite = this.getBirths() + ";" +
                              this.getDeaths() + ";" +
@@ -269,8 +269,8 @@ public final class RabbitModel
                              this.getPredators();
             FileStuff.writeToFile(fileName, toWrite);
         }
-        meanRatio /= Main.TOTAL_MONTHS;
-        System.out.println("mean ratio=" + meanRatio);
+        //        meanRatio /= Main.TOTAL_MONTHS;
+        //        System.out.print(meanRatio + ", ");
         nbOfReplicates++;
         return this.getPop();
     }

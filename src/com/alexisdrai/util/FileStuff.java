@@ -9,11 +9,7 @@ public class FileStuff
         try
         {
             File myObj = new File(fileName);
-            if (myObj.createNewFile())
-            {
-                System.out.println("File created: " + myObj.getName());
-            }
-            else
+            if (!myObj.createNewFile())
             {
                 throw new RuntimeException("file already exists, please delete or remove them first");
             }

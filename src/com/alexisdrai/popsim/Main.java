@@ -76,7 +76,7 @@ public final class Main
         errorMargin = STUDENT_T * stdError;
 
         final String printout = "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n" +
-                                "after " + REPLICATES + " replicates of a " + TOTAL_MONTHS +
+                                "after " + REPLICATES + " replicates of a " + YEARS_PER_EXPERIMENT +
                                 "-year-long experiment\n" +
                                 "with " + FEMALES + " female and " + MALES + " male starting rabbits\n" +
                                 "observed population levels were such:\n" +
