@@ -3,7 +3,11 @@ package com.alexisdrai.popsim;
 import com.alexisdrai.util.FileStuff;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.HashSet;
+
+import static java.util.Objects.requireNonNull;
 
 public final class RabbitModel
 {
@@ -12,19 +16,17 @@ public final class RabbitModel
     private static final int    MEAN_KITS_PER_LITTER    = 4;                        // 4
     private static final double STD_DEV_KITS_PER_LITTER = 2 / 3.0;                  // 0.6_ (2 / 3.0)
     private static final double DEATH_IN_LABOR_RATE     = 0.15;                     // 0.15
-    private static final double MEAN_KILLS              = 7000;                     // 5000.0 (added on top)
-    private static final double STD_DEVIATION_KILLS     = 1000.0;                   // 1000.0 (added on top)
+    private static final double MEAN_KILLS              = 2000;                     // 2000 (added on top)
+    private static final double STD_DEVIATION_KILLS     = 1000 / 3.0;               // 333.33_ (added on top)
 
     private static int nbOfReplicates = 1;
 
     // linked lists take more space but allow for insertions and removals at O(1)
-    private final LinkedList<Rabbit> rabbits  = new LinkedList<>();
-    private final ArrayList<Rabbit>  toAdd    = new ArrayList<>();
-    private final ArrayList<Rabbit>  toRemove = new ArrayList<>();
-    //    private final ArrayList<Integer> toRemove = new ArrayList<>();
+    private final Set<Rabbit>       rabbits = new HashSet<>();
+    private final ArrayList<Rabbit> toAdd   = new ArrayList<>();
 
-    // storing pop figures as separate attributes to avoid having to call the lists size() methods
-    // ... and also, in order to have a slightly better-detailed vue
+    // storing pop figures as separate attributes to avoid having to call the collections' size() methods
+    // ... and also, in order to have a slightly better-detailed set of data
     private long    deaths             = 0;
     private long    births             = 0;
     private int     predators          = 0;
@@ -34,7 +36,7 @@ public final class RabbitModel
     {
         for (int i = 0; i < numFem + numMal; i++)
         {
-            // make as many female ones as requested, then the rest can be male
+            // making as many female ones as requested, then the rest can be male
             this.rabbits.add(makeRabbit(i < numFem));
         }
     }
@@ -116,7 +118,10 @@ public final class RabbitModel
     private void destroyRabbit(Rabbit rabbit)
     {
         this.deaths++;
-        if (rabbit.isRabbitOfCaerbannog()) this.predators--;
+        if (requireNonNull(rabbit).isRabbitOfCaerbannog())
+        {
+            this.predators--;
+        }
         rabbit.kill();
     }
 
@@ -137,28 +142,28 @@ public final class RabbitModel
     {
         if (this.getPop() <= Main.MAX_INT)
         {
-            for (int j = 0; j < this.getPredators(); j++)
+            if (this.getPredators() > 0)
             {
-                int kills;
-                if (this.getPop() >= PREDATOR_THRESHOLD)
+                for (int j = 0; j < this.getPredators(); j++)
                 {
-                    kills = (int) Math.round(Main.MT.nextGaussian()
-                                             * STD_DEVIATION_KILLS
-                                             + MEAN_KILLS);
-                    // this casting should be fine, since there are less than MAX_INT rabbits
-                }
-                else
-                {
-                    this.setPredatorsActive(false);
-                    return;
-                }
-                for (int k = 0; k < kills; k++)
-                {
+                    if (this.getPop() < PREDATOR_THRESHOLD)
                     {
-                        int idx = Main.MT.nextInt((int) (this.getPop()));
-                        this.destroyRabbit(this.rabbits.get(idx));
-                        this.rabbits.remove(idx);
-                        // randomly drawing the victims among all pop --
+                        this.setPredatorsActive(false);
+                        return;
+                    }
+                    int k = 0;
+                    int kills = (int) Math.round(Main.MT.nextGaussian()
+                                                 * STD_DEVIATION_KILLS
+                                                 + MEAN_KILLS);
+                    // this casting should be fine, since there are less than MAX_INT rabbits
+
+                    Iterator<Rabbit> it = this.rabbits.iterator();
+                    while (k < kills && it.hasNext())
+                    {
+                        // counting on HashSets being randomly arranged for randomly drawing the victims among all pop --
+                        this.destroyRabbit(it.next());
+                        it.remove();
+                        k++;
                     }
                 }
             }
@@ -178,7 +183,7 @@ public final class RabbitModel
      */
     long run(int months)
     {
-        String fileName = "rabbits" + months + "m_i" + nbOfReplicates + ".csv";
+        String fileName = "data_results/rabbits" + months + "m_i" + nbOfReplicates + ".csv";
         FileStuff.createFile(fileName);
         FileStuff.writeToFile(fileName, "births;deaths;pop;predators");
 
@@ -189,8 +194,10 @@ public final class RabbitModel
         {
             long start = System.nanoTime();
             System.out.println("\nrep_" + nbOfReplicates + "_month_" + month);
-            for (Rabbit rabbit : this.rabbits)
+            Iterator<Rabbit> it = this.rabbits.iterator();
+            while (it.hasNext())
             {
+                Rabbit rabbit = it.next();
                 // ageing rabbits first
                 if (!rabbit.isDead())
                 {
@@ -201,7 +208,7 @@ public final class RabbitModel
                 if (rabbit.isDead())
                 {
                     this.destroyRabbit(rabbit);
-                    this.toRemove.add(rabbit);
+                    it.remove();
                     continue; // we're done with this rabbit
                 }
                 // checking for births due in that specific rabbit's month
@@ -216,8 +223,8 @@ public final class RabbitModel
                     if (Main.MT.nextBoolean(DEATH_IN_LABOR_RATE))
                     {
                         this.destroyRabbit(rabbit);
-                        this.toRemove.add(rabbit);
-                        continue;
+                        it.remove();
+                        continue; // rip
                     }
                     else
                     {
@@ -239,12 +246,9 @@ public final class RabbitModel
                 }
 
             }
-            // removing inactive cells to avoid stack overflow and performance issues
-            // using auxiliary lists, for pop evolution, to avoid concurrent modification errors at runtime
-            // iterators are cool for removing elements mid-loop, but adding elements on top gets tricky
-            this.rabbits.removeAll(this.toRemove);
+            // removing inactive cells to avoid stack overflow and performance issues using auxiliary lists,
+            // for pop evolution, to avoid concurrent modification errors at runtime when adding elements
             this.rabbits.addAll(this.toAdd);
-            this.toRemove.clear();
             this.toAdd.clear();
 
             if (this.arePredatorsActive())
@@ -268,7 +272,7 @@ public final class RabbitModel
                              this.getPredators();
             FileStuff.writeToFile(fileName, toWrite);
         }
-        meanRatio /= months - 1;
+        meanRatio /= months;
         System.out.println("mean ratio=" + meanRatio);
         nbOfReplicates++;
         return this.getPop();

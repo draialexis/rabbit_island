@@ -32,7 +32,7 @@ instructions (in French).
 
 _**Needs further optimization**, please be aware that these rabbits breed like... uh ... llamas or something. There may
 be situations where predators can't keep them down, which means the population will keep growing exponentially, which
-means iterating through the `run` function will take exponentially more time._
+means iterating through the model's `run` function will keep taking exponentially more time._
 
 ## Compilation and execution
 

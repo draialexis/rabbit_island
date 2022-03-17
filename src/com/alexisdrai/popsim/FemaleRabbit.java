@@ -57,11 +57,7 @@ public final class FemaleRabbit extends Rabbit
 
     void setFertile(boolean fertile)
     {
-        if (!this.isPotentiallyFertile())
-        {
-            throw new RuntimeException("that rabbit can never be fertile, this method shouldn't have been called on it");
-        }
-        if (this.isFertile != fertile)
+        if (this.isPotentiallyFertile() && this.isFertile != fertile)
         {
             this.isFertile = fertile;
         }
