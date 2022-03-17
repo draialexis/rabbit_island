@@ -28,7 +28,7 @@ public final class Main
         final double STUDENT_T  = 2.68; // depends on REPLICATES
         // refer to https://www.supagro.fr/cnam-lr/statnet/tables.htm for co-dependant values
 
-        final String fileName = "rabbit_pop_results.txt";
+        final String fileName = "data/rabbit_pop_results.txt";
 
         final int MALES   = 5;
         final int FEMALES = 10;

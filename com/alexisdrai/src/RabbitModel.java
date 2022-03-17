@@ -61,7 +61,6 @@ public final class RabbitModel
     }
 
     /**
-     * <h2>makeRabbit</h2>
      * <p>simply calls {@link #makeRabbit(boolean)} with a random boolean
      * based on {@link #FEMALE_RATIO}</p>
      *
@@ -73,7 +72,6 @@ public final class RabbitModel
     }
 
     /**
-     * <h2>makeRabbit</h2>
      * <p>increments the number of births for this model and instantiates a new
      * {@link Rabbit} of a predetermined sex.</p>
      * <p>if that was a predator rabbit <small>(don't question it)</small>,
@@ -103,10 +101,9 @@ public final class RabbitModel
     }
 
     /**
-     * <h2>destroyRabbit</h2>
      * <p>increments the number of deaths for this model and invokes a given {@link Rabbit}'s
      * {@link Rabbit#kill()} method</p>
-     * <p>if that was a predator rabbit<small>(don't question it)</small>,
+     * <p>if that was a predator rabbit <small>(don't question it)</small>,
      * decrements the number of predators as well</p>
      *
      * @param rabbit the {@link Rabbit} instance to be destroyed
@@ -119,7 +116,6 @@ public final class RabbitModel
     }
 
     /**
-     * <h2>getPop</h2>
      * <p>calculates the current population total for this model</p>
      *
      * @return the current population total
@@ -130,8 +126,7 @@ public final class RabbitModel
     }
 
     /**
-     * <h2>cull</h2>
-     * <p>decreases the population total by a number proportional to the number of predators in the model</p>
+     * <p>decreases the population total by a number through the use of "predators"</p>
      */
     private void cull()
     {
@@ -166,20 +161,19 @@ public final class RabbitModel
         else
         {
             throw new RuntimeException("so, we're looking at " + Main.MAX_INT +
-                                       "+ rabbits. This shouldn't have happened");
+                                       "+ rabbits. This should never have happened");
         }
     }
 
     /**
-     * <h2>run</h2>
-     * <p>runs the model through a certain number of steps</p>
+     * <p>runs the model through a certain number of steps (months)</p>
      *
      * @param months the number of steps through which the model will be run
      * @return the final population total
      */
     long run(int months)
     {
-        String fileName = "rabbits" + months + "m_i" + nbOfReplicates + ".csv";// TODO remove before shipping
+        String fileName = "data/rabbits" + months + "m_i" + nbOfReplicates + ".csv";// TODO remove before shipping
         FileStuff.createFile(fileName);// TODO remove before shipping
         FileStuff.writeToFile(fileName, "births;deaths;pop;predators");// TODO remove before shipping
 

@@ -33,7 +33,7 @@ public final class FemaleRabbit extends Rabbit
     }
 
     /**
-     * <h2>getPregnancyPlanner</h2>
+     * getPregnancyPlanner
      *
      * @return provides a copy of its own {@link #pregnancyPlanner}
      */
@@ -67,7 +67,7 @@ public final class FemaleRabbit extends Rabbit
     }
 
     /**
-     * <h2>updatePregnancyPlanner</h2>
+     * updatePregnancyPlanner
      * <p>index origin is based on the rabbit's maturation anniversary</p>
      */
     private void updatePregnancyPlanner()
@@ -106,8 +106,7 @@ public final class FemaleRabbit extends Rabbit
     }
 
     /**
-     * <h2>wipePregnancyPlanner</h2>
-     * <p></p>
+     * wipePregnancyPlanner
      */
     private void wipePregnancyPlanner()
     {
@@ -117,6 +116,9 @@ public final class FemaleRabbit extends Rabbit
         }
     }
 
+    /**
+     * maturificate
+     */
     @Override
     void maturificate()
     {
@@ -128,8 +130,8 @@ public final class FemaleRabbit extends Rabbit
     }
 
     /**
-     * <h2>ageUp</h2>
-     * <p></p>
+     * ageUp
+     * <p>increments a rabbit's age by one month, then checks for death and maturity, and finally plans out yearly litters</p>
      */
     @Override
     void ageUp()

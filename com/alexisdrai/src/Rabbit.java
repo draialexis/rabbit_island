@@ -78,7 +78,7 @@ public class Rabbit
     }
 
     /**
-     * <h2>maturificate</h2>
+     * maturificate
      * <p>simply sets this rabbit's {@code isMature} property to true.</p>
      */
     void maturificate()
@@ -91,7 +91,7 @@ public class Rabbit
     }
 
     /**
-     * <h2>kill</h2>
+     * kill
      * <p>simply sets this rabbit's {@code isDead} property to true.</p>
      * <p>since the reverse should not be done, no need for a setter.</p>
      */
@@ -104,7 +104,7 @@ public class Rabbit
     }
 
     /**
-     * <h2>checkDead</h2>
+     * checkDead
      * <p></p>
      */
     private void checkDead()
@@ -141,9 +141,8 @@ public class Rabbit
     }
 
     /**
-     * <h2>ageUp</h2>
-     * <p>increments a rabbit's age by one month.</p>
-     * <p>then checks for death and maturity</p>
+     * ageUp
+     * <p>increments a rabbit's age by one month, then checks for death and maturity</p>
      */
     void ageUp()
     {

@@ -31,7 +31,7 @@ means iterating through the `run` function will take exponentially more time._
 
 ## Compilation and execution
 
-`javac -Xlint:all -d build src/*.java`
+`javac -Xlint:all -d build com/alexisdrai/src/*.java`
 
 &&
 
