@@ -13,8 +13,8 @@ public final class Main
         MT = new MersenneTwisterFast(new int[]{0x123, 0x234, 0x345, 0x456});
     }
 
-    public static final int MAX_INT              = 2147483647;
-    public static final int MONTHS_PER_YEAR      = 12;
+    public static final int MAX_INT         = 2147483647;
+    public static final int MONTHS_PER_YEAR = 12;
 
     public static final int YEARS_PER_EXPERIMENT = 20;
     public static final int TOTAL_MONTHS         = MONTHS_PER_YEAR * YEARS_PER_EXPERIMENT;
@@ -32,8 +32,8 @@ public final class Main
         System.out.println("\nOk, that's enough rabbits\n");
 
         System.out.println("================= 2) Dank ill rabbit pop sim (actual sim) =================");
-        final int    REPLICATES = 50; // STUDENT_T depends on this
-        final double STUDENT_T  = 2.68; // depends on REPLICATES
+        final int    REPLICATES = 141; // STUDENT_T depends on this
+        final double STUDENT_T  = 2.6114; // depends on REPLICATES
         // refer to https://www.supagro.fr/cnam-lr/statnet/tables.htm for co-dependant values
 
         final String fileName = "data_results/rabbit_pop_results.txt";
@@ -91,5 +91,4 @@ public final class Main
         FileStuff.writeToFile(fileName, printout);
         System.out.println(printout);
     }
-
 }

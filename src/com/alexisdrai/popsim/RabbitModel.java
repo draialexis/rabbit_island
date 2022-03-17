@@ -118,11 +118,11 @@ public final class RabbitModel
     private void destroyRabbit(Rabbit rabbit)
     {
         this.deaths++;
-        if (requireNonNull(rabbit).isRabbitOfCaerbannog())
+        requireNonNull(rabbit).kill();
+        if (rabbit.isRabbitOfCaerbannog())
         {
             this.predators--;
         }
-        rabbit.kill();
     }
 
     /**
