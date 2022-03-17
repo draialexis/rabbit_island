@@ -179,7 +179,7 @@ public final class RabbitModel
      */
     long run(int months)
     {
-        String fileName = "rabbits" + months + "m_i" + nbOfReplicates++ + ".csv";// TODO remove before shipping
+        String fileName = "rabbits" + months + "m_i" + nbOfReplicates + ".csv";// TODO remove before shipping
         FileStuff.createFile(fileName);// TODO remove before shipping
         FileStuff.writeToFile(fileName, "births;deaths;pop;predators");// TODO remove before shipping
 
@@ -189,7 +189,7 @@ public final class RabbitModel
         for (int month = 1; month <= months; month++)
         {
             long start = System.nanoTime();// TODO remove before shipping
-            System.out.println("\nmonth=" + month);
+            System.out.println("\nrep_" + nbOfReplicates + "_month_" + month);
             for (Rabbit rabbit : this.rabbits)
             {
                 // ageing rabbits first
@@ -272,6 +272,7 @@ public final class RabbitModel
         }
         meanRatio /= months - 1;
         System.out.println("mean ratio=" + meanRatio);
+        nbOfReplicates++;
         return this.getPop();
         // TODO show graphs
     }
