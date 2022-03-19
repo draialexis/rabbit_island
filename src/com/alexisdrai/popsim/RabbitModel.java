@@ -133,12 +133,12 @@ public final class RabbitModel
      */
     private int getPop()
     {
-        long res = this.getBirths() - this.getDeaths();
-        if (res > Main.MAX_INT)
+        long pop = this.getBirths() - this.getDeaths();
+        if (pop > Main.MAX_INT)
         {
-            throw new RuntimeException("We're looking at " + res + " rabbits here. Better stop now");
+            throw new RuntimeException("We're looking at " + pop + " rabbits. Something went wrong. Better stop now");
         }
-        return (int) res;
+        return (int) pop;
     }
 
     /**
