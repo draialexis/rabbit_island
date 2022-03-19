@@ -9,6 +9,9 @@ import java.util.HashSet;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * <p>has fields and methods meant to model a {@link Rabbit} population roughly, including growing and shrinking</p>
+ */
 public final class RabbitModel
 {
     private static final int    PREDATOR_THRESHOLD      = 50_000;                   // 50000 (added on top)
@@ -174,7 +177,7 @@ public final class RabbitModel
 
     /**
      * <p>runs the {@link RabbitModel} through a statically given number of steps (months),
-     * while timing the execution and recording resulting data to text files</p>
+     * while recording resulting data to text files</p>
      *
      * @return the final population total
      */

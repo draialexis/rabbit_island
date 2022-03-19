@@ -1,5 +1,9 @@
 package com.alexisdrai.popsim;
 
+/**
+ * <p>has fields and methods meant to model a rabbit roughly, including aging, being born, and preying on other rabbits</p>
+ * <p>OK, that's not exactly <em>rabbit-like</em>, but that choice has been made</p>
+ */
 public class Rabbit
 {
     private static final int      EARLIEST_MATURITY_START      = 5;           // 5

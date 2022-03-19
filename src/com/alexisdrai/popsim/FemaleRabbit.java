@@ -1,5 +1,9 @@
 package com.alexisdrai.popsim;
 
+/**
+ * <p>has all fields and methods of the {@link Rabbit} class, adding onto it features pertaining to birthing and
+ * fertility</p>
+ */
 public final class FemaleRabbit extends Rabbit
 {
 

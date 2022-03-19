@@ -3,8 +3,7 @@ package com.alexisdrai.popsim;
 public class SimpleRabbitSim
 {
     /**
-     * determines the size of a rabbit population, in couples,
-     * in function of how many months it has had to grow
+     * <p>determines the size of a rabbit population, in couples, in function of how many months it has had to grow</p>
      *
      * @param months the amount of time since the first couple was spawned
      * @return the size of said rabbit population after said number of months, <strong>in couples</strong>
