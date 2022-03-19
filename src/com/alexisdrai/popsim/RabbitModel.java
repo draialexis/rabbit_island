@@ -14,17 +14,16 @@ import static java.util.Objects.requireNonNull;
  */
 public final class RabbitModel
 {
-    private static final int    PREDATOR_THRESHOLD      = 50_000;                   // 50000 (added on top)
-    private static final double FEMALE_RATIO            = 0.5;                      // 0.5
-    private static final int    MEAN_KITS_PER_LITTER    = 4;                        // 4
-    private static final double STD_DEV_KITS_PER_LITTER = 2 / 3.0;                  // 0.6_ (2 / 3.0)
-    private static final double DEATH_IN_LABOR_RATE     = 0.15;                     // 0.15
-    private static final double MEAN_KILLS              = 4000;                     // 2000 (added on top)
-    private static final double STD_DEVIATION_KILLS     = 1000;                     // 1000 (added on top)
+    private static final int    PREDATOR_THRESHOLD        = 50_000;                   // 50000 (added on top)
+    private static final double MEAN_KILLS                = 4000;                     // 2000 (added on top)
+    private static final double STD_DEVIATION_KILLS       = 1000;                     // 1000 (added on top)
+    private static final double FEMALE_RATIO              = 0.5;                      // 0.5
+    private static final int    MEAN_KITTEN_PER_LITTER    = 4;                        // 4
+    private static final double STD_DEV_KITTEN_PER_LITTER = 2 / 3.0;                  // 0.6_ (2 / 3.0)
+    private static final double DEATH_IN_LABOR_RATE       = 0.15;                     // 0.15
 
     private static int nbOfReplicates = 1;
 
-    // linked lists take more space but allow for insertions and removals at O(1)
     private final Set<Rabbit>       rabbits = new HashSet<>();
     private final ArrayList<Rabbit> toAdd   = new ArrayList<>();
 
@@ -97,7 +96,6 @@ public final class RabbitModel
         if (isFemale)
         {
             rabbit = new FemaleRabbit();
-
         }
         else
         {
@@ -150,26 +148,27 @@ public final class RabbitModel
     {
         if (this.getPredators() > 0)
         {
-            for (int j = 0; j < this.getPredators(); j++)
+            for (int i = 0; i < this.getPredators(); i++)
             {
                 if (this.getPop() < PREDATOR_THRESHOLD)
                 {
+                    // under the pop threshold, all predators go back to alfalfa and carrots
                     this.setPredatorsActive(false);
                     return;
                 }
-                int k = 0;
+                int j = 0;
                 int kills = (int) Math.round(Main.MT.nextGaussian()
                                              * STD_DEVIATION_KILLS
                                              + MEAN_KILLS);
                 // this casting should be fine, since there are less than MAX_INT rabbits
 
                 Iterator<Rabbit> it = this.rabbits.iterator();
-                while (k < kills && it.hasNext())
+                while (j < kills && it.hasNext())
                 {
                     // counting on HashSets being randomly arranged for randomly drawing the victims among all pop --
                     this.destroyRabbit(it.next());
                     it.remove();
-                    k++;
+                    j++;
                 }
             }
         }
@@ -183,17 +182,17 @@ public final class RabbitModel
      */
     int run()
     {
+        if (nbOfReplicates > 1)
+        {
+            System.out.println("done");
+        }
         String fileName = "data_results/rabbits" + Main.TOTAL_MONTHS + "m_i" + nbOfReplicates + ".csv";
         FileStuff.createFile(fileName);
         FileStuff.writeToFile(fileName, "births;deaths;pop;predators");
+        System.out.print("creating " + fileName + "... ");
 
-        //        double ratio    = 0.0, meanRatio = 0.0;
-        //        long   prevTime = 0, crtTime;
-
-        for (int month = 1; month <= Main.TOTAL_MONTHS; month++)
+        for (int i = 1; i <= Main.TOTAL_MONTHS; i++)
         {
-            //            long start = System.nanoTime();
-            //            System.out.println("\nrep_" + nbOfReplicates + "_month_" + month);
             Iterator<Rabbit> it = this.rabbits.iterator();
             while (it.hasNext())
             {
@@ -229,25 +228,22 @@ public final class RabbitModel
                     else
                     {
                         int kitten = (int) Math.round(Main.MT.nextGaussian()
-                                                      * STD_DEV_KITS_PER_LITTER
-                                                      + MEAN_KITS_PER_LITTER);
+                                                      * STD_DEV_KITTEN_PER_LITTER
+                                                      + MEAN_KITTEN_PER_LITTER);
                         // explicitly casting long into an int, should be fine with the numbers we expect
-                        for (int kit = 0; kit < kitten; kit++)
+                        for (int j = 0; j < kitten; j++)
                         {
                             this.toAdd.add(this.makeRabbit());
                         }
                     }
                 }
                 // dealing with overpopulation using predators
-                // under the pop threshold, all predators go back to alfalfa and carrots
                 if (this.getPop() >= PREDATOR_THRESHOLD)
                 {
                     this.setPredatorsActive(true);
                 }
-
             }
-            // removing inactive cells to avoid stack overflow and performance issues using auxiliary lists,
-            // for pop evolution, to avoid concurrent modification errors at runtime when adding elements
+            // to avoid concurrent modification errors at runtime when adding elements
             this.rabbits.addAll(this.toAdd);
             this.toAdd.clear();
 
@@ -255,25 +251,12 @@ public final class RabbitModel
             {
                 this.cull();
             }
-
-            //            crtTime = System.nanoTime() - start;
-            //            if (prevTime != 0)
-            //            {
-            //                ratio = crtTime / (double) prevTime;
-            //                meanRatio += ratio;
-            //            }
-            //            System.out.println("Elapsed Time: " + crtTime + " ns");
-            //            System.out.println("Ratio: " + (ratio != 0.0 ? ratio : "N/A"));
-            //            prevTime = crtTime;
-
             String toWrite = this.getBirths() + ";" +
                              this.getDeaths() + ";" +
                              this.getPop() + ";" +
                              this.getPredators();
             FileStuff.writeToFile(fileName, toWrite);
         }
-        //        meanRatio /= Main.TOTAL_MONTHS;
-        //        System.out.print(meanRatio + ", ");
         nbOfReplicates++;
         return this.getPop();
     }

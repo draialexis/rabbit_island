@@ -46,7 +46,16 @@ public class Rabbit
         }
     }
 
-    private final int maturityStart;
+    /**
+     * <p><strong>But!</strong>
+     * <br>Follow only if ye be men of valor, for the entrance to this cave is guarded by a
+     * creature so foul, so cruel that no man yet has fought with it <em>and lived</em>!
+     * <br>Bones of full fifty men lie strewn about its lair!
+     * <br>So, brave knights, if ye do doubt your courage or your strength, come nae further!
+     * For death awaits you all <small>with nasty big pointy teeth</small>.</p>
+     */
+    private final boolean isRabbitOfCaerbannog;
+    private final int     maturityStart;
 
     private boolean isMature    = false;
     private boolean isDead      = false;
@@ -155,14 +164,4 @@ public class Rabbit
         this.checkDead();
         this.maturificate();
     }
-
-    /**
-     * <p><strong>But!</strong>
-     * <br>Follow only if ye be men of valor, for the entrance to this cave is guarded by a
-     * creature so foul, so cruel that no man yet has fought with it <em>and lived</em>!
-     * <br>Bones of full fifty men lie strewn about its lair!
-     * <br>So, brave knights, if ye do doubt your courage or your strength, come nae further!
-     * For death awaits you all <small>with nasty big pointy teeth</small>.</p>
-     */
-    private final boolean isRabbitOfCaerbannog;
 }

@@ -36,7 +36,7 @@ public final class Main
         final double STUDENT_T  = 2.6114; // depends on REPLICATES
         // refer to https://www.supagro.fr/cnam-lr/statnet/tables.htm for co-dependant values
 
-        final String fileName = "data_results/rabbit_pop_results.txt";
+        final String FILENAME = "data_results/rabbit_pop_results.txt";
 
         final int MALES   = 5;
         final int FEMALES = 10;
@@ -46,12 +46,12 @@ public final class Main
         double stdDeviation;
         double stdError;
         double errorMargin;
-        long[] results  = new long[REPLICATES];
+        int[]  results  = new int[REPLICATES];
 
         int tmp;
 
         // logging results and calculating estimated mean
-        FileStuff.createFile(fileName);
+        FileStuff.createFile(FILENAME);
         for (i = 0; i < REPLICATES; i++)
         {
             RabbitModel model = new RabbitModel(FEMALES, MALES);
@@ -59,7 +59,7 @@ public final class Main
             tmp = model.run();
             mean += tmp;
             results[i] = tmp;
-            FileStuff.writeToFile(fileName, tmp + ",");
+            FileStuff.writeToFile(FILENAME, tmp + ",");
         }
         mean /= REPLICATES;
 
@@ -88,7 +88,7 @@ public final class Main
                                 "99% confidence interval = [" + (mean - errorMargin) + "," + (mean + errorMargin) + "]";
 
         // logging and printing out results
-        FileStuff.writeToFile(fileName, printout);
+        FileStuff.writeToFile(FILENAME, printout);
         System.out.println(printout);
     }
 }

@@ -6,7 +6,6 @@ package com.alexisdrai.popsim;
  */
 public final class FemaleRabbit extends Rabbit
 {
-
     private static final double FERTILITY_PROB           = 0.9;         // 0.9
     private static final int    INTERVAL_SIZE_FERTILITY  = 48;          // 48 -- 4 years (added on top)
     private static final int    MEAN_LITTERS_PER_YEAR    = 6;           // 6
