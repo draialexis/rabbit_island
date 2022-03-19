@@ -32,8 +32,8 @@ public final class Main
         System.out.println("\nOk, that's enough rabbits\n");
 
         System.out.println("================= 2) Dank ill rabbit pop sim (actual sim) =================");
-        final int    REPLICATES = 141; // STUDENT_T depends on this
-        final double STUDENT_T  = 2.6114; // depends on REPLICATES
+        final int    REPLICATES = 2000; // STUDENT_T depends on this
+        final double STUDENT_T  = 2.5759; // depends on REPLICATES
         // refer to https://www.supagro.fr/cnam-lr/statnet/tables.htm for co-dependant values
 
         final String FILENAME = "data_results/rabbit_pop_results.txt";

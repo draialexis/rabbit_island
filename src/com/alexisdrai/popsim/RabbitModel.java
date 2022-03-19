@@ -15,7 +15,7 @@ import static java.util.Objects.requireNonNull;
 public final class RabbitModel
 {
     private static final int    PREDATOR_THRESHOLD        = 50_000;                   // 50000 (added on top)
-    private static final double MEAN_KILLS                = 4000;                     // 2000 (added on top)
+    private static final double MEAN_KILLS                = 3000;                     // 3000 (added on top)
     private static final double STD_DEVIATION_KILLS       = 1000;                     // 1000 (added on top)
     private static final double FEMALE_RATIO              = 0.5;                      // 0.5
     private static final int    MEAN_KITTEN_PER_LITTER    = 4;                        // 4
