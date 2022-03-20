@@ -97,6 +97,10 @@ public class Rabbit
      */
     void maturificate()
     {
+        if (this.isDead())
+        {
+            throw new RuntimeException("a dead rabbit doesn't need to mature: something went wrong");
+        }
         //putting the least likely condition first, to get out of the AND conditional structure faster
         if ((this.getAgeInMonths() == this.getMaturityStart()) && !(this.isMature()))
         {

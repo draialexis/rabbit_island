@@ -19,9 +19,9 @@ Simulating rabbit population growth, with replicate experiments, given a few fac
 This program then estimates a mean final population count for the given duration, and uses variance and t-distribution
 to determine a 99% confidence interval for a _true mean_ for said final count.
 
-The resulting data will be found in `build/com/alexisdrai/popsim/data/` after execution
+The resulting data will be found in `/data_results` after execution
 
-This program uses [`MersenneTwisterFast`](https://javadoc.scijava.org/SciJava/org/scijava/util/MersenneTwisterFast.html)
+This program uses `MersenneTwisterFast` ([doc](https://javadoc.scijava.org/SciJava/org/scijava/util/MersenneTwisterFast.html))
 for pseudorandom number generation.
 
 The default values for the aforementioned factors may be perused
@@ -30,9 +30,10 @@ instructions (in French).
 
 ## Warning
 
-_**Needs further optimization**, please be aware that these rabbits breed like... uh ... llamas or something. There may
+_**Needs further optimization**, please be aware that these rabbits breed like... uh ... llamas or something._ There may
 be situations where predators can't keep them down, which means the population will keep growing exponentially, which
-means iterating through the model's `run` function will keep taking exponentially more time._
+means iterating through the model's `run` function will keep taking exponentially more time. This program prevents
+populations from rising above `Integer.MAX_VALUE`
 
 ## Compilation and execution
 

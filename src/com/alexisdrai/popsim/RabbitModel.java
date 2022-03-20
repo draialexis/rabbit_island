@@ -134,7 +134,7 @@ public final class RabbitModel
     private int getPop()
     {
         long pop = this.getBirths() - this.getDeaths();
-        if (pop > Main.MAX_INT)
+        if (pop > Integer.MAX_VALUE)
         {
             throw new RuntimeException("We're looking at " + pop + " rabbits. Something went wrong. Better stop now");
         }
@@ -160,7 +160,7 @@ public final class RabbitModel
                 int kills = (int) Math.round(Main.MT.nextGaussian()
                                              * STD_DEVIATION_KILLS
                                              + MEAN_KILLS);
-                // this casting should be fine, since there are less than MAX_INT rabbits
+                // this casting should be fine, since there are less than Integer.MAX_VALUE rabbits
 
                 Iterator<Rabbit> it = this.rabbits.iterator();
                 while (j < kills && it.hasNext())

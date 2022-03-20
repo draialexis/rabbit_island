@@ -71,6 +71,10 @@ public final class FemaleRabbit extends Rabbit
      */
     private void updatePregnancyPlanner()
     {
+        if (this.isDead())
+        {
+            throw new RuntimeException("a dead rabbit doesn't need to plan pregnancies: something went wrong");
+        }
         int fertility_career = this.getAgeInMonths() - this.getMaturityStart();
         // putting the least likely condition first, to get out of the AND conditional structure faster
         if

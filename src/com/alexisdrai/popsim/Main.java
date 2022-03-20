@@ -12,8 +12,6 @@ public final class Main
         // initializing the Mersenne Twister
         MT = new MersenneTwisterFast(new int[]{0x123, 0x234, 0x345, 0x456});
     }
-
-    public static final int MAX_INT         = 2147483647;
     public static final int MONTHS_PER_YEAR = 12;
 
     public static final int YEARS_PER_EXPERIMENT = 20;
