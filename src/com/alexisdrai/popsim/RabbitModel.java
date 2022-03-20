@@ -15,11 +15,11 @@ import static java.util.Objects.requireNonNull;
 public final class RabbitModel
 {
     private static final int    PREDATOR_THRESHOLD        = 50_000;                   // 50000 (added on top)
-    private static final double MEAN_KILLS                = 3000;                     // 3000 (added on top)
-    private static final double STD_DEVIATION_KILLS       = 1000;                     // 1000 (added on top)
+    private static final double MEAN_KILLS                = 1500;                     // 1500 (added on top)
+    private static final double STD_DEVIATION_KILLS       = 1000 / 3.0;               // 333.3_ (added on top)
     private static final double FEMALE_RATIO              = 0.5;                      // 0.5
     private static final int    MEAN_KITTEN_PER_LITTER    = 4;                        // 4
-    private static final double STD_DEV_KITTEN_PER_LITTER = 2 / 3.0;                  // 0.6_ (2 / 3.0)
+    private static final double STD_DEV_KITTEN_PER_LITTER = 2 / 3.0;                  // 0.6_
     private static final double DEATH_IN_LABOR_RATE       = 0.15;                     // 0.15
 
     private static int nbOfReplicates = 1;

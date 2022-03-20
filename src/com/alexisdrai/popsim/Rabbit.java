@@ -9,7 +9,7 @@ public class Rabbit
     private static final int      EARLIEST_MATURITY_START      = 5;           // 5
     private static final int      INTERVAL_SIZE_MATURITY_START = 3;           // 3
     private static final int      MAX_AGE_MONTHS               = 156;         // 156 -- 13 years (suggested 13 years)
-    private static final double   CAERBANNOG_RATIO             = 1 / 16384.0; // 0.00006 (1 in 2^14) (added on top)
+    private static final double   CAERBANNOG_RATIO             = 1 / 8192.0; // 0.0001 (1 in 2^13) (added on top)
     private static final double   KIT_YEARLY_MORTALITY         = 0.75;        // 0.75
     private static final double[] YEARLY_MORTALITIES           = {
             // [0;1[ (will be ignored in static monthly mortality rate calculations)
