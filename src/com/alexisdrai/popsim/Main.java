@@ -12,6 +12,7 @@ public final class Main
         // initializing the Mersenne Twister
         MT = new MersenneTwisterFast(new int[]{0x123, 0x234, 0x345, 0x456});
     }
+
     public static final int MONTHS_PER_YEAR = 12;
 
     public static final int YEARS_PER_EXPERIMENT = 20;
@@ -33,6 +34,7 @@ public final class Main
         final int    REPLICATES = 2000; // STUDENT_T depends on this
         final double STUDENT_T  = 2.5759; // depends on REPLICATES
         // refer to https://www.supagro.fr/cnam-lr/statnet/tables.htm for co-dependant values
+        System.out.println("launching " + REPLICATES + " replicates");
 
         final String FILENAME = "data_results/rabbit_pop_results.txt";
 
@@ -73,7 +75,7 @@ public final class Main
         stdError = stdDeviation / Math.sqrt(REPLICATES);
         errorMargin = STUDENT_T * stdError;
 
-        final String printout = "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n" +
+        final String printout = "\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n" +
                                 "after " + REPLICATES + " replicates of a " + YEARS_PER_EXPERIMENT +
                                 "-year-long experiment\n" +
                                 "with " + FEMALES + " female and " + MALES + " male starting rabbits\n" +

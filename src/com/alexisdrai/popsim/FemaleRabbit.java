@@ -85,10 +85,11 @@ public final class FemaleRabbit extends Rabbit
         )
         {
             this.wipePregnancyPlanner();
-            double rdm = Math.round(Main.MT.nextGaussian()
+
+            int yearlyDue = (int) Math.round(Main.MT.nextGaussian()
                                     * STD_DEV_LITTERS_PER_YEAR
-                                    + MEAN_LITTERS_PER_YEAR);
-            int yearlyDue = (int) rdm; // explicitly casting long into an int
+                                    + MEAN_LITTERS_PER_YEAR); 
+									// explicitly casting long into an int
 
             int toBeSpawned = 0;
             if (yearlyDue > 0)
@@ -139,7 +140,7 @@ public final class FemaleRabbit extends Rabbit
     void ageUp()
     {
         super.ageUp();
-        if (this.isFertile())
+        if (this.isFertile() && !(this.isDead()))
         {
             this.updatePregnancyPlanner();
         }

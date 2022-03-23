@@ -166,6 +166,9 @@ public class Rabbit
         }
         this.ageInMonths++;
         this.checkDead();
-        this.maturificate();
+		if (!(this.isDead()))
+		{
+			this.maturificate();
+		}
     }
 }
