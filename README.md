@@ -30,7 +30,9 @@ instructions (in French).
 
 ## Warning
 
-_**Needs further optimization**, please be aware that these rabbits breed like... uh ... llamas or something._ There may
+**This program will create a bunch of .csv files and a .txt file, in a data_result folder at the root.**
+
+_Needs further optimization, please be aware that these rabbits breed like... uh ... llamas or something._ There may
 be situations where predators can't keep them down, which means the population will keep growing exponentially, which
 means iterating through the model's `run` function will keep taking exponentially more time. This program prevents
 populations from rising above `Integer.MAX_VALUE`
