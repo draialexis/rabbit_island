@@ -30,7 +30,7 @@ instructions (in French).
 
 ## Warning
 
-**This program will create a bunch of .csv files and a .txt file, in a data_result folder at the root.**
+**PERMISSIONS MAY NEED TO BE UPDATED MANUALLY BEFORE COMPILING: This program will create a bunch of .csv files and a .txt file, in a data_result folder at the root.**
 
 _Needs further optimization, please be aware that these rabbits breed like... uh ... llamas or something._ There may
 be situations where predators can't keep them down, which means the population will keep growing exponentially, which
