@@ -1,7 +1,5 @@
 package com.alexisdrai.popsim;
 
-import com.alexisdrai.util.FileStuff;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
@@ -14,15 +12,13 @@ import static java.util.Objects.requireNonNull;
  */
 public final class RabbitModel
 {
-    private static final int    PREDATOR_THRESHOLD        = 50_000;                   // 50000 (added on top)
-    private static final double MEAN_KILLS                = 1500;                     // 1500 (added on top)
-    private static final double STD_DEVIATION_KILLS       = 1000 / 3.0;               // 333.3_ (added on top)
-    private static final double FEMALE_RATIO              = 0.5;                      // 0.5
-    private static final int    MEAN_KITTEN_PER_LITTER    = 4;                        // 4
-    private static final double STD_DEV_KITTEN_PER_LITTER = 2 / 3.0;                  // 0.6_
-    private static final double DEATH_IN_LABOR_RATE       = 0.15;                     // 0.15
-
-    private static int nbOfReplicates = 1;
+    private static final int    PREDATOR_THRESHOLD        = 50_000;
+    private static final double MEAN_KILLS                = 1500;
+    private static final double STD_DEVIATION_KILLS       = 1000 / 3.0;
+    private static final double FEMALE_RATIO              = 0.5;
+    private static final int    MEAN_KITTEN_PER_LITTER    = 4;
+    private static final double STD_DEV_KITTEN_PER_LITTER = 2 / 3.0;
+    private static final double DEATH_IN_LABOR_RATE       = 0.15;
 
     private final Set<Rabbit>       rabbits = new HashSet<>();
     private final ArrayList<Rabbit> toAdd   = new ArrayList<>();
@@ -175,22 +171,12 @@ public final class RabbitModel
     }
 
     /**
-     * <p>runs the {@link RabbitModel} through a statically given number of steps (months),
-     * while recording resulting data to text files</p>
+     * <p>runs the {@link RabbitModel} through a statically given number of steps (months)</p>
      *
      * @return the final population total
      */
     int run()
     {
-        if (nbOfReplicates > 1)
-        {
-            System.out.println("done");
-        }
-        String fileName = "data_results/rabbits" + Main.TOTAL_MONTHS + "m_i" + nbOfReplicates + ".csv";
-        FileStuff.createFile(fileName);
-        FileStuff.writeToFile(fileName, "births;deaths;pop;predators");
-        System.out.print("creating " + fileName + "... ");
-
         for (int i = 1; i <= Main.TOTAL_MONTHS; i++)
         {
             Iterator<Rabbit> it = this.rabbits.iterator();
@@ -251,13 +237,7 @@ public final class RabbitModel
             {
                 this.cull();
             }
-            String toWrite = this.getBirths() + ";" +
-                             this.getDeaths() + ";" +
-                             this.getPop() + ";" +
-                             this.getPredators();
-            FileStuff.writeToFile(fileName, toWrite);
         }
-        nbOfReplicates++;
         return this.getPop();
     }
 }

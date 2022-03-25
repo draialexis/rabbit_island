@@ -6,10 +6,10 @@ package com.alexisdrai.popsim;
  */
 public final class FemaleRabbit extends Rabbit
 {
-    private static final double FERTILITY_PROB           = 0.9;         // 0.9
-    private static final int    INTERVAL_SIZE_FERTILITY  = 48;          // 48 -- 4 years (added on top)
-    private static final int    MEAN_LITTERS_PER_YEAR    = 6;           // 6
-    private static final double STD_DEV_LITTERS_PER_YEAR = 1.0;         // 1.0
+    private static final double FERTILITY_PROB           = 0.9;
+    private static final int    INTERVAL_SIZE_FERTILITY  = 48;
+    private static final int    MEAN_LITTERS_PER_YEAR    = 6;
+    private static final double STD_DEV_LITTERS_PER_YEAR = 1.0;
 
     private final boolean isPotentiallyFertile;
 
@@ -87,9 +87,9 @@ public final class FemaleRabbit extends Rabbit
             this.wipePregnancyPlanner();
 
             int yearlyDue = (int) Math.round(Main.MT.nextGaussian()
-                                    * STD_DEV_LITTERS_PER_YEAR
-                                    + MEAN_LITTERS_PER_YEAR); 
-									// explicitly casting long into an int
+                                             * STD_DEV_LITTERS_PER_YEAR
+                                             + MEAN_LITTERS_PER_YEAR);
+            // explicitly casting long into an int
 
             int toBeSpawned = 0;
             if (yearlyDue > 0)

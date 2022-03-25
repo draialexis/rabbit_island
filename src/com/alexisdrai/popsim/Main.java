@@ -1,7 +1,9 @@
 package com.alexisdrai.popsim;
 
-import com.alexisdrai.util.FileStuff;
 import com.alexisdrai.util.MersenneTwisterFast;
+
+import java.util.Arrays;
+//import MersenneTwisterFast;
 
 public final class Main
 {
@@ -15,7 +17,8 @@ public final class Main
 
     public static final int MONTHS_PER_YEAR = 12;
 
-    public static final int YEARS_PER_EXPERIMENT = 20;
+    public static final int YEARS_PER_EXPERIMENT = 10;
+    // originally was 20
     public static final int TOTAL_MONTHS         = MONTHS_PER_YEAR * YEARS_PER_EXPERIMENT;
 
     public static void main(String[] args)
@@ -31,12 +34,13 @@ public final class Main
         System.out.println("\nOk, that's enough rabbits\n");
 
         System.out.println("================= 2) Dank ill rabbit pop sim (actual sim) =================");
-        final int    REPLICATES = 2000; // STUDENT_T depends on this
-        final double STUDENT_T  = 2.5759; // depends on REPLICATES
+        final int    REPLICATES = 100; // STUDENT_T depends on this
+        // originally was 2000
+        final double STUDENT_T  = 2.6259; // depends on REPLICATES
+        // originally was 2.5759
         // refer to https://www.supagro.fr/cnam-lr/statnet/tables.htm for co-dependant values
-        System.out.println("launching " + REPLICATES + " replicates");
 
-        final String FILENAME = "data_results/rabbit_pop_results.txt";
+        System.out.println("launching " + REPLICATES + " replicates");
 
         final int MALES   = 5;
         final int FEMALES = 10;
@@ -51,15 +55,15 @@ public final class Main
         int tmp;
 
         // logging results and calculating estimated mean
-        FileStuff.createFile(FILENAME);
         for (i = 0; i < REPLICATES; i++)
         {
+            System.out.print("running " + TOTAL_MONTHS + " months, replicate no." + (i + 1) + "... ");
             RabbitModel model = new RabbitModel(FEMALES, MALES);
             // getting final pop results
             tmp = model.run();
             mean += tmp;
             results[i] = tmp;
-            FileStuff.writeToFile(FILENAME, tmp + ",");
+            System.out.println("final_pop: " + tmp);
         }
         mean /= REPLICATES;
 
@@ -87,8 +91,8 @@ public final class Main
                                 "margin of error = " + errorMargin + "\n" +
                                 "99% confidence interval = [" + (mean - errorMargin) + "," + (mean + errorMargin) + "]";
 
-        // logging and printing out results
-        FileStuff.writeToFile(FILENAME, printout);
+        // printing out results
+        System.out.println("\nfinal results = " + Arrays.toString(results));
         System.out.println(printout);
     }
 }

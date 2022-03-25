@@ -6,11 +6,11 @@ package com.alexisdrai.popsim;
  */
 public class Rabbit
 {
-    private static final int      EARLIEST_MATURITY_START      = 5;           // 5
-    private static final int      INTERVAL_SIZE_MATURITY_START = 3;           // 3
-    private static final int      MAX_AGE_MONTHS               = 156;         // 156 -- 13 years (suggested 13 years)
-    private static final double   CAERBANNOG_RATIO             = 1 / 8192.0; // 0.0001 (1 in 2^13) (added on top)
-    private static final double   KIT_YEARLY_MORTALITY         = 0.75;        // 0.75
+    private static final int      EARLIEST_MATURITY_START      = 5;
+    private static final int      INTERVAL_SIZE_MATURITY_START = 3;
+    private static final int      MAX_AGE_MONTHS               = 156;
+    private static final double   CAERBANNOG_RATIO             = 1 / 8192.0;
+    private static final double   KIT_YEARLY_MORTALITY         = 0.75;
     private static final double[] YEARLY_MORTALITIES           = {
             // [0;1[ (will be ignored in static monthly mortality rate calculations)
             0.25,    // [1;2[
@@ -26,9 +26,11 @@ public class Rabbit
             0.85,    // [11;12[
             1.0      // [12;13[
     };
-    private static final double   KIT_MONTHLY_MORTALITY        =
+
+    private static final double KIT_MONTHLY_MORTALITY =
             Math.pow((1 + KIT_YEARLY_MORTALITY), (1 / (Main.MONTHS_PER_YEAR * 1.0))) - 1;
-    private static final double[] MONTHLY_MORTALITIES          = new double[MAX_AGE_MONTHS - Main.MONTHS_PER_YEAR];
+
+    private static final double[] MONTHLY_MORTALITIES = new double[MAX_AGE_MONTHS - Main.MONTHS_PER_YEAR];
     // ignoring year 0->1
 
     static
@@ -166,9 +168,9 @@ public class Rabbit
         }
         this.ageInMonths++;
         this.checkDead();
-		if (!(this.isDead()))
-		{
-			this.maturificate();
-		}
+        if (!(this.isDead()))
+        {
+            this.maturificate();
+        }
     }
 }
