@@ -24,9 +24,14 @@ The resulting data will be found in `/data_results` after execution
 This program uses `MersenneTwisterFast` ([doc](https://javadoc.scijava.org/SciJava/org/scijava/util/MersenneTwisterFast.html))
 for pseudorandom number generation.
 
+## Instructions, report (in French)
+
 The default values for the aforementioned factors may be perused
 [here](https://github.com/draialexis/sims_tp4/files/8238541/Lab.4.-.Rabbit.Population.growth.pdf), along with the
-instructions (in French).
+instructions.
+
+The report can be found [here](https://github.com/draialexis/sims_tp4/files/8804564/tp4_report_v2.pdf)
+
 
 ## Warning
 
