@@ -1,6 +1,6 @@
 # Rabbits everywhere
 
-**Check this repo's `doc` folder (or [this repo](https://github.com/draialexis/rabbit_island_doc)) to see the appropriate Javadoc**
+**Check this repo's `doc` folder to see the appropriate Javadoc**
 
 Simulating rabbit population growth, with replicate experiments, given a few factors:
 
