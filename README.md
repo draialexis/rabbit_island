@@ -1,5 +1,12 @@
 # Rabbits everywhere
 
++ [About](#about)
++ [Instructions, report (in French)](#instructions-report-in-french)
++ [Warning](#warning)
++ [Compilation and execution](#compilation-and-execution)
+
+## About
+
 **Check this repo's `doc` folder to see the appropriate Javadoc**
 
 Simulating rabbit population growth, with replicate experiments, given a few factors:
